@@ -5,8 +5,16 @@ import org.junit.jupiter.api.Assertions.*
 import java.lang.Exception
 
 class MyEventListener : Listener {
-    override fun onEvent(event: Event) {
-        print("test")
+
+    @EventHandler
+    fun onEvent(event: Event) {
+        println("test")
+    }
+
+
+    @EventHandler
+    fun onEventTwo(event: Event){
+        println("test2")
     }
 }
 
