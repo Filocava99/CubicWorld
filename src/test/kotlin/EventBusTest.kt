@@ -12,7 +12,7 @@ class MyEventListener : Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onEventTwo(event: Event){
         println("test2")
     }
@@ -25,7 +25,7 @@ internal class EventBusTest {
         val myListener = MyEventListener()
         val eventBus = EventBus()
         assertDoesNotThrow {
-            eventBus.registerListener(myListener,EventPriority.NORMAL)
+            eventBus.registerListener(myListener)
         }
     }
 
@@ -33,7 +33,7 @@ internal class EventBusTest {
     fun dispatchEvent(){
         val myListener = MyEventListener()
         val eventBus = EventBus()
-        eventBus.registerListener(myListener,EventPriority.NORMAL)
+        eventBus.registerListener(myListener)
         val event = Event()
         assertDoesNotThrow {
             eventBus.dispatchEvent(event)
