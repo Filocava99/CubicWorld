@@ -2,23 +2,19 @@ import event.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import java.lang.Exception
-
-class MyEventListener : Listener {
-
-    @EventHandler
-    fun onEvent(event: Event) {
-        println("test")
-    }
-
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun onEventTwo(event: Event){
-        println("test2")
-    }
-}
 
 internal class EventBusTest {
+
+    internal class MyEventListener : Listener {
+
+        @EventHandler
+        fun onEvent(event: Event) {
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        fun onEventTwo(event: Event){
+        }
+    }
 
     @Test
     fun registerListener(){
