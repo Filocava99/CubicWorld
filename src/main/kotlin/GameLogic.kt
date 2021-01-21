@@ -1,0 +1,7 @@
+interface GameLogic {
+
+    fun init()
+
+
+
+}

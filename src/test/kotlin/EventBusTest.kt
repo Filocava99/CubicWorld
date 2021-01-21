@@ -5,14 +5,29 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class EventBusTest {
 
+    internal class EventOne : Event(){
+
+    }
+
+    internal class EventTwo : Event(){
+
+    }
+
     internal class MyEventListener : Listener {
 
         @EventHandler
-        fun onEvent(event: Event) {
+        fun onEvent(event: EventOne) {
+            println("Event one")
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
-        fun onEventTwo(event: Event){
+        fun onEventTwo(event: EventTwo){
+            println("First")
+        }
+
+        @EventHandler
+        fun onEventThree(event: EventTwo){
+            println("Second")
         }
     }
 
