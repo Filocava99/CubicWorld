@@ -1,3 +1,5 @@
+package it.filippocavallari.lwge
+
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*
@@ -55,11 +57,13 @@ class Window(
         if (fullscreen) glfwMaximizeWindow(windowId) else {
             val monitor = glfwGetVideoMode(glfwGetPrimaryMonitor())
             Objects.requireNonNull(monitor)
-            glfwSetWindowPos(
-                windowId,
-                (monitor!!.width() - width) / 2,
-                (monitor!!.height() - height) / 2
-            )
+            if (monitor != null) {
+                glfwSetWindowPos(
+                    windowId,
+                    (monitor.width() - width) / 2,
+                    (monitor.height() - height) / 2
+                )
+            }
         }
     }
 

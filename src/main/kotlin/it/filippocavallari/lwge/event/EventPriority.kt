@@ -1,4 +1,4 @@
-package event
+package it.filippocavallari.lwge.event
 
 enum class EventPriority(val priority: Int) {
     MONITOR(6),

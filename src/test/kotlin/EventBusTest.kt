@@ -1,33 +1,19 @@
-import event.*
+import it.filippocavallari.lwge.event.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
 internal class EventBusTest {
 
-    internal class EventOne : Event(){
-
+    internal class MyEventListener : Listener<Event> {
+        override fun onEvent(event: Event) {
+            println("One")
+        }
     }
 
-    internal class EventTwo : Event(){
-
-    }
-
-    internal class MyEventListener : Listener {
-
-        @EventHandler
-        fun onEvent(event: EventOne) {
-            println("Event one")
-        }
-
-        @EventHandler(priority = EventPriority.HIGHEST)
-        fun onEventTwo(event: EventTwo){
-            println("First")
-        }
-
-        @EventHandler
-        fun onEventThree(event: EventTwo){
-            println("Second")
+    internal class MyEventListenerTwo : Listener<Event> {
+        override fun onEvent(event: Event) {
+            println("Two")
         }
     }
 
@@ -36,16 +22,18 @@ internal class EventBusTest {
         val myListener = MyEventListener()
         val eventBus = EventBus()
         assertDoesNotThrow {
-            eventBus.registerListener(myListener)
+            eventBus.register(myListener)
         }
     }
 
     @Test
     fun dispatchEvent(){
         val myListener = MyEventListener()
+        val myListenerTwo = MyEventListenerTwo()
         val eventBus = EventBus()
-        eventBus.registerListener(myListener)
-        val event = Event()
+        val event = Event(1)
+        eventBus.register(myListener)
+        eventBus.register(myListenerTwo, EventPriority.HIGH)
         assertDoesNotThrow {
             eventBus.dispatchEvent(event)
         }

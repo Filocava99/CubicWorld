@@ -1,3 +1,4 @@
+import it.filippocavallari.lwge.Timer
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -16,7 +17,7 @@ internal class TimerTest {
 
     @Test
     fun getTime() {
-        assertEquals(System.nanoTime()/1000000000,Timer().time.toLong())
+        assertEquals(System.nanoTime()/1000000000, Timer().time.toLong())
     }
 
     @Test

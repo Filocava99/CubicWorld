@@ -1,3 +1,5 @@
+package it.filippocavallari.lwge
+
 class Timer {
 
     var lastLoopTime = time
