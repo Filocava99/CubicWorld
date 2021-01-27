@@ -5,5 +5,11 @@
 */
 
 job("Build and run tests") {
-   gradlew("openjdk:11", "build")
+   container("openjdk:11"){
+       shellScript {
+            content = """
+                ./gradlew test
+            """
+        }
+   }
 }
