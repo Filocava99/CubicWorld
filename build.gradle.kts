@@ -84,7 +84,6 @@ dependencies {
     runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-opengles", classifier = lwjglNatives)
-    runtimeOnly("org.lwjgl", "lwjgl-openvr", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-opus", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-par", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-remotery", classifier = lwjglNatives)
