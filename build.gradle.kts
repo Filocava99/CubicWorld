@@ -51,7 +51,6 @@ dependencies {
     implementation("org.lwjgl", "lwjgl-opencl")
     implementation("org.lwjgl", "lwjgl-opengl")
     implementation("org.lwjgl", "lwjgl-opengles")
-    implementation("org.lwjgl", "lwjgl-openvr")
     implementation("org.lwjgl", "lwjgl-opus")
     implementation("org.lwjgl", "lwjgl-par")
     implementation("org.lwjgl", "lwjgl-remotery")
