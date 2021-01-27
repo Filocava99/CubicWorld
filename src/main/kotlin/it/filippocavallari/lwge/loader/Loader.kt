@@ -14,7 +14,6 @@ import java.nio.file.Paths
 import java.util.*
 import java.util.stream.Collectors
 
-
 object Loader {
 
     private val VBOsPool = LinkedList<Vbo>()

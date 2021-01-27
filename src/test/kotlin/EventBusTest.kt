@@ -5,15 +5,23 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class EventBusTest {
 
-    internal class MyEventListener : Listener<Event> {
-        override fun onEvent(event: Event) {
-            println("One")
+    internal class MyEvent() : Event(1), Cancellable{
+        override var cancelled: Boolean = false
+    }
+
+    internal class MyEventListener : Listener<MyEvent> {
+        override fun onEvent(event: MyEvent) {
+            println("Primo")
+            if(!event.cancelled){
+                throw Exception("Event should have been cancelled by the previous listener")
+            }
         }
     }
 
-    internal class MyEventListenerTwo : Listener<Event> {
-        override fun onEvent(event: Event) {
-            println("Two")
+    internal class MyEventListenerTwo : Listener<MyEvent> {
+        override fun onEvent(event: MyEvent) {
+            println("Secondo")
+            event.cancelled = true
         }
     }
 
@@ -31,11 +39,10 @@ internal class EventBusTest {
         val myListener = MyEventListener()
         val myListenerTwo = MyEventListenerTwo()
         val eventBus = EventBus()
-        val event = Event(1)
         eventBus.register(myListener)
         eventBus.register(myListenerTwo, EventPriority.HIGH)
         assertDoesNotThrow {
-            eventBus.dispatchEvent(event)
+            eventBus.dispatchEvent(MyEvent())
         }
     }
 }
