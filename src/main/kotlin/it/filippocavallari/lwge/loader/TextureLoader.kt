@@ -26,8 +26,7 @@ object TextureLoader {
                 val h = stack.mallocInt(1)
                 val channels = stack.mallocInt(1)
                 val outputStream: OutputStream = FileOutputStream("temp.png")
-                val inputStream =
-                    Thread.currentThread().contextClassLoader.getResourceAsStream(filename)!!
+                val inputStream = File(filename).inputStream()
                 inputStream.transferTo(outputStream)
                 inputStream.close()
                 outputStream.close()
@@ -86,4 +85,5 @@ object TextureLoader {
 
 private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
     block(this)
+    this.close()
 }

@@ -19,17 +19,17 @@ class MouseManager(val window: Long) {
     init {
         glfwSetCursorEnterCallback(window, object : GLFWCursorEnterCallback(){
             override fun invoke(window: Long, entered: Boolean) {
-                TODO("Not yet implemented")
+
             }
         })
         glfwSetCursorPosCallback(window, object : GLFWCursorPosCallback(){
             override fun invoke(window: Long, xpos: Double, ypos: Double) {
-                TODO("Not yet implemented")
+
             }
         })
         glfwSetMouseButtonCallback(window, object : GLFWMouseButtonCallback(){
             override fun invoke(window: Long, button: Int, action: Int, mods: Int) {
-                TODO("Not yet implemented")
+
             }
         })
     }

@@ -1,5 +1,6 @@
 package it.filippocavallari.lwge
 
+import it.filippocavallari.lwge.event.*
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*
@@ -9,6 +10,12 @@ import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import java.util.*
+import org.lwjgl.glfw.GLFW.glfwPollEvents
+
+import org.lwjgl.glfw.GLFW.glfwSwapBuffers
+
+
+
 
 class Window(
     val title: String,
@@ -16,12 +23,22 @@ class Window(
     var height: Int
 ) {
 
+    private val FOV = Math.toRadians(60.0).toFloat()
+    private val Z_NEAR = 0.01f
+    private val Z_FAR = 1000f
+
     var vSync: Boolean = false
     var fullscreen: Boolean = false
     var resized = false
     var debug: Boolean = false
     var clearColor: Vector4f = Vector4f(0f, 0f, 0f, 0f)
     var projectionMatrix: Matrix4f = Matrix4f()
+    get() {
+        //TODO Ha senso aggiornare ad ogni chiamata? Quanto mi costa?
+        val aspectRatio = width.toFloat() / height.toFloat()
+        field = field.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR)
+        return field
+    }
 
     var windowId: Long = -1
         private set
@@ -34,18 +51,22 @@ class Window(
         setupWindowHint()
         windowId = glfwCreateWindow(width, height, title, 0, 0)
 
-
         glfwSetFramebufferSizeCallback(windowId, object : GLFWFramebufferSizeCallback() {
             override fun invoke(window: Long, width: Int, height: Int) {
+                val windowResizedEvent = WindowResizedEvent(width,height)
+                GameEngine.eventBus.dispatchEvent(windowResizedEvent)
                 resized = true
-                //TODO CALL BACK
             }
         })
         glfwSetKeyCallback(windowId,object : GLFWKeyCallback(){
             override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
-                TODO("Not yet implemented")
+                val event: KeyEvent = when (action) {
+                    GLFW_PRESS -> KeyPressedEvent(key)
+                    GLFW_RELEASE -> KeyReleasedEvent(key)
+                    else -> KeyEvent(key, action)
+                }
+                GameEngine.eventBus.dispatchEvent(event)
             }
-
         })
         glfwMakeContextCurrent(windowId)
         GL.createCapabilities()
@@ -118,5 +139,13 @@ class Window(
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
     }
 
+    fun update() {
+        if (resized) {
+            glViewport(0, 0, width, height)
+            resized = false
+        }
+        glfwSwapBuffers(windowId)
+        glfwPollEvents()
+    }
 
 }

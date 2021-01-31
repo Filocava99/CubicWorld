@@ -1,5 +1,96 @@
 package it.filippocavallari.lwge
 
-class GameEngine {
+import it.filippocavallari.lwge.event.EventBus
+import org.joml.Matrix4f
+import org.joml.Vector4f
+import org.lwjgl.glfw.GLFW.glfwHideWindow
+import kotlin.system.exitProcess
 
+
+class GameEngine(val gameLogic: GameLogic) {
+    private val TARGET_FPS = 75 //frames per second
+    private val TARGET_UPS = 30 //updates per second
+
+    private lateinit var window: Window
+    private lateinit var mouseManager: MouseManager
+    private val timer: Timer = Timer()
+
+    init{
+        window = Window("CubicWorld",1920,1080)
+        window.run {
+            clearColor = Vector4f(255f,0f,0f,0f)
+            enableDepthTest(true)
+            showWindow(true)
+        }
+        mouseManager = MouseManager(window.windowId)
+        projectionMatrix = window.projectionMatrix
+        gameLogic.init()
+    }
+
+    fun run() {
+        try {
+            gameLoop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cleanUp()
+        }
+    }
+
+    private fun gameLoop() {
+        var elapsedTime: Float
+        var accumulator = 0f
+        val interval = 1f / TARGET_UPS
+        val running = true
+        while (running) {//&& !window.windowShouldClose()) {
+            elapsedTime = timer.elapsedTime
+            accumulator += elapsedTime
+            input()
+            while (accumulator >= interval) {
+                update(interval)
+                accumulator -= interval
+            }
+            render()
+            if (!window.vSync) {
+                sync()
+            }
+        }
+    }
+
+    private fun sync() {
+        val loopSlot = 1f / TARGET_FPS
+        val endTime = timer.lastLoopTime + loopSlot
+        while (timer.time < endTime) {
+            try {
+                Thread.sleep(1)
+            } catch (ignored: InterruptedException) {
+            } finally {
+                //cleanUp()
+            }
+        }
+    }
+
+    private fun input() {
+
+    }
+
+    private fun update(interval: Float) {
+        gameLogic.update()
+    }
+
+    private fun render() {
+        gameLogic.render()
+        window.update()
+    }
+
+    private fun cleanUp() {
+        gameLogic.cleanUp()
+        glfwHideWindow(window.windowId)
+        exitProcess(0)
+    }
+
+    companion object{
+        lateinit var projectionMatrix: Matrix4f
+        val eventBus = EventBus()
+    }
 }

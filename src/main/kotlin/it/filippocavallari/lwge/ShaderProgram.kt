@@ -12,7 +12,7 @@ import java.util.*
 class ShaderProgram {
 
     private var programId = 0
-    private var uniforms: MutableMap<String, Int>? = null
+    private var uniforms: MutableMap<String, Int> = HashMap()
     private var vertexShaderId = 0
     private var fragmentShaderId = 0
 
@@ -38,9 +38,9 @@ class ShaderProgram {
             uniformName
         )
         if (uniformLocation < 0) {
-            throw Exception("Could not find uniform:$uniformName")
+            throw Exception("Could not find uniform: $uniformName")
         }
-        uniforms!![uniformName] = uniformLocation
+        uniforms[uniformName] = uniformLocation
     }
 
     fun createMaterialUniform(uniformName: String) {
@@ -53,13 +53,13 @@ class ShaderProgram {
 
 
     fun setUniform(uniformName: String, value: Int) {
-        uniforms?.get(uniformName)?.let { glUniform1i(it, value) }
+        glUniform1i(uniforms[uniformName]!!, value)
     }
 
     fun setUniform(uniformName: String, value: Matrix4f) {
         // Dump the matrix into a float buffer
         MemoryStack.stackPush().use {
-            glUniformMatrix4fv(uniforms!![uniformName]!!,false, value[it.mallocFloat(16)])
+            glUniformMatrix4fv(uniforms[uniformName]!!,false, value[it.mallocFloat(16)])
         }
     }
 
@@ -73,15 +73,15 @@ class ShaderProgram {
 
 
     fun setUniform(uniformName: String, value: Float) {
-        glUniform1f(uniforms!![uniformName]!!, value)
+        glUniform1f(uniforms[uniformName]!!, value)
     }
 
     fun setUniform(uniformName: String, value: Vector3f) {
-        glUniform3f(uniforms!![uniformName]!!, value.x, value.y, value.z)
+        glUniform3f(uniforms[uniformName]!!, value.x, value.y, value.z)
     }
 
     fun setUniform(uniformName: String, value: Vector4f) {
-        glUniform4f(uniforms!![uniformName]!!, value.x, value.y, value.z, value.w)
+        glUniform4f(uniforms[uniformName]!!, value.x, value.y, value.z, value.w)
     }
 
     private fun createShader(shaderCode: String?, shaderType: Int): Int {
@@ -137,4 +137,5 @@ class ShaderProgram {
 
 private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
     block(this)
+    this.close()
 }

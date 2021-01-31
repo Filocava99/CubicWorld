@@ -14,6 +14,7 @@ import java.nio.file.Paths
 import java.util.*
 import java.util.stream.Collectors
 
+
 object Loader {
 
     private val VBOsPool = LinkedList<Vbo>()
@@ -52,15 +53,15 @@ object Loader {
 
     fun createVBOs(amount: Int){
         val intArray = IntArray(amount)
-        glGenVertexArrays(intArray)
+        glGenBuffers(intArray)
         VBOsPool.addAll(intArray.toMutableList().stream().map { Vbo(it) }.collect(Collectors.toList()))
     }
 
     private fun createVBO(){
-        VBOsPool.add(Vbo(glGenVertexArrays()))
+        VBOsPool.add(Vbo(glGenBuffers()))
     }
 
-    fun loadPositionsArrayInVbo(vbo: Vbo, array: FloatArray){
+    fun loadVerticesInVbo(vbo: Vbo, array: FloatArray){
         val buffer = MemoryUtil.memAllocFloat(array.size)
         array.forEach { buffer.put(it) }
         buffer.flip()
@@ -77,6 +78,16 @@ object Loader {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.id)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer, GL_STATIC_DRAW)
         MemoryUtil.memFree(buffer)
+    }
+
+    fun loadUVsInVbo(vbo: Vbo, uvs: FloatArray) {
+        val textCoordsBuffer = MemoryUtil.memAllocFloat(uvs.size)
+        for (uv in uvs) {
+            textCoordsBuffer.put(uv)
+        }
+        textCoordsBuffer.flip()
+        loadFloatBufferInVbo(textCoordsBuffer, vbo, 2, 1)
+        MemoryUtil.memFree(textCoordsBuffer)
     }
 
     fun loadNormalsInVbo(vbo: Vbo, normals: FloatArray) {

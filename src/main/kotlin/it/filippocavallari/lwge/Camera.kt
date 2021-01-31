@@ -6,7 +6,6 @@ import org.joml.Vector3f
 class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector3f = Vector3f(0f, 0f, 0f)) {
     private val cameraStep = 1f
     private val cameraMovement = Vector3f()
-    private val transformation = Transformation()
     val viewMatrix = Matrix4f()
 
     fun setPosition(x: Float, y: Float, z: Float) {
