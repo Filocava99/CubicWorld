@@ -1,5 +1,11 @@
 package it.filippocavallari.lwge
 
+import it.filippocavallari.lwge.event.cursor.CursorEnteredWindowEvent
+import it.filippocavallari.lwge.event.cursor.CursorLeftWindowEvent
+import it.filippocavallari.lwge.event.cursor.CursorMovedEvent
+import it.filippocavallari.lwge.event.mouse.MouseButtonClickedEvent
+import it.filippocavallari.lwge.event.mouse.MouseButtonEvent
+import it.filippocavallari.lwge.event.mouse.MouseButtonReleasedEventEvent
 import org.joml.Vector2f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWCursorEnterCallback
@@ -19,17 +25,24 @@ class MouseManager(val window: Long) {
     init {
         glfwSetCursorEnterCallback(window, object : GLFWCursorEnterCallback(){
             override fun invoke(window: Long, entered: Boolean) {
-
+                val event = if(entered) CursorEnteredWindowEvent() else CursorLeftWindowEvent()
+                GameEngine.eventBus.dispatchEvent(event)
             }
         })
         glfwSetCursorPosCallback(window, object : GLFWCursorPosCallback(){
             override fun invoke(window: Long, xpos: Double, ypos: Double) {
-
+                val event = CursorMovedEvent(xpos, ypos)
+                GameEngine.eventBus.dispatchEvent(event)
             }
         })
         glfwSetMouseButtonCallback(window, object : GLFWMouseButtonCallback(){
             override fun invoke(window: Long, button: Int, action: Int, mods: Int) {
-
+                val event = when(action) {
+                    GLFW_PRESS -> MouseButtonClickedEvent(button)
+                    GLFW_RELEASE -> MouseButtonReleasedEventEvent(button)
+                    else -> MouseButtonEvent(button, action)
+                }
+                GameEngine.eventBus.dispatchEvent(event)
             }
         })
     }

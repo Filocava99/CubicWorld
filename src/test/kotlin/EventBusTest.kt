@@ -1,4 +1,5 @@
 import it.filippocavallari.lwge.event.*
+import it.filippocavallari.lwge.listener.Listener
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*

@@ -1,6 +1,6 @@
 package it.filippocavallari.cubicworld
 
-import it.filippocavallari.Renderer
+import it.filippocavallari.lwge.Renderer
 import it.filippocavallari.lwge.*
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.Mesh

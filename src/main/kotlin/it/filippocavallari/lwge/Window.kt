@@ -1,6 +1,7 @@
 package it.filippocavallari.lwge
 
 import it.filippocavallari.lwge.event.*
+import it.filippocavallari.lwge.event.window.WindowResizedEvent
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.*

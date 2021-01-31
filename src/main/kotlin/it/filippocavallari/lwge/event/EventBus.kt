@@ -1,5 +1,6 @@
 package it.filippocavallari.lwge.event
 
+import it.filippocavallari.lwge.listener.Listener
 import java.util.*
 import kotlin.reflect.KClass
 

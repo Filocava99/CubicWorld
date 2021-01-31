@@ -1,7 +1,5 @@
-package it.filippocavallari
+package it.filippocavallari.lwge
 
-import it.filippocavallari.lwge.GameEngine
-import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.graphic.Mesh
 import org.lwjgl.opengl.GL11C.*
 import org.lwjgl.opengl.GL13C.GL_TEXTURE0
