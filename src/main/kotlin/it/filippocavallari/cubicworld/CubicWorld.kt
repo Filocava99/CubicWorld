@@ -2,10 +2,13 @@ package it.filippocavallari.cubicworld
 
 import it.filippocavallari.lwge.Renderer
 import it.filippocavallari.lwge.*
+import it.filippocavallari.lwge.graphic.DirectionalLight
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.Mesh
+import it.filippocavallari.lwge.graphic.PointLight
 import it.filippocavallari.lwge.loader.Loader
 import it.filippocavallari.lwge.loader.TextureLoader
+import org.joml.Vector3f
 import org.lwjgl.opengl.GL30C.glBindVertexArray
 
 class CubicWorld : GameLogic {
@@ -21,170 +24,116 @@ class CubicWorld : GameLogic {
         shaderProgram.link()
         shaderProgram.validateProgram()
         shaderProgram.createUniform("texture_sampler")
+        shaderProgram.createUniform("normalMap")
         shaderProgram.createUniform("modelViewMatrix")
         shaderProgram.createUniform("projectionMatrix")
-        val texture = TextureLoader.createTexture("src/main/resources/dirt.png")
-        val material = Material(texture, reflectance = 1f)
+        shaderProgram.createMaterialUniform("material")
+        shaderProgram.createPointLightUniform("pointLight")
+        shaderProgram.createDirectionalLightUniform("directionalLight")
+        shaderProgram.createUniform("ambientLight")
+        shaderProgram.createUniform("specularPower")
+        val texture = TextureLoader.createTexture("src/main/resources/bricks.png")
+        val normalMap = TextureLoader.createTexture("src/main/resources/bricks_n.png")
+        val material = Material(texture, normalMap, reflectance = 0f)
         val vao = Loader.getVAO()
         val vertexVbo = Loader.getVBO()
         val indicesVbo = Loader.getVBO()
         val textureVbo = Loader.getVBO()
         val normalVbo = Loader.getVBO()
-//        val vertices = floatArrayOf(
-//            //FRONT FACE
-//            0f,1f,0f, //0
-//            0f,0f,0f, //1
-//            1f,0f,0f, //2
-//            1f,1f,0f, //3
-//            //RIGHT FACE
-//            1f,1f,0f, //4
-//            1f,0f,0f, //5
-//            1f,0f,1f, //6
-//            1f,1f,1f, //7
-//            //LEFT FACE
-//            0f,1f,1f, //8
-//            0f,0f,1f, //9
-//            0f,0f,0f, //10
-//            0f,1f,0f, //11
-//            //TOP FACE
-//            0f,1f,1f, //12
-//            0f,1f,0f, //13
-//            1f,1f,0f, //14
-//            1f,1f,1f, //15
-//            //BOTTOM FACE
-//            1f,0f,1f, //16
-//            1f,0f,0f, //17
-//            0f,0f,0f, //18
-//            0f,0f,1f, //19
-//            //BACK FACE
-//            1f,1f,1f, //20
-//            1f,0f,1f, //21
-//            0f,0f,1f, //22
-//            0f,1f,1f //23
-//        )
-//        val indices = intArrayOf(
-//            //front
-//            0,1,3,3,1,2,
-//            //right
-//            4,5,7,7,5,6,
-//            //left
-//            8,9,11,11,9,10,
-//            //top
-//            12,13,15,15,13,14,
-//            //bottom
-//            16,17,19,19,17,18,
-//            //back
-//            20,21,23,23,21,22
-//        )
-//        val uvs = floatArrayOf(
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//            0f,0f,0f,1f,1f,1f,1f,0f,
-//        )
         val vertices = floatArrayOf(
-            // V0
-            -0.5f, 0.5f, 0.5f,
-            // V1
-            -0.5f, -0.5f, 0.5f,
-            // V2
-            0.5f, -0.5f, 0.5f,
-            // V3
-            0.5f, 0.5f, 0.5f,
-            // V4
-            -0.5f, 0.5f, -0.5f,
-            // V5
-            0.5f, 0.5f, -0.5f,
-            // V6
-            -0.5f, -0.5f, -0.5f,
-            // V7
-            0.5f, -0.5f, -0.5f,
-
-            // For text coords in top face
-            // V8: V4 repeated
-            -0.5f, 0.5f, -0.5f,
-            // V9: V5 repeated
-            0.5f, 0.5f, -0.5f,
-            // V10: V0 repeated
-            -0.5f, 0.5f, 0.5f,
-            // V11: V3 repeated
-            0.5f, 0.5f, 0.5f,
-
-            // For text coords in right face
-            // V12: V3 repeated
-            0.5f, 0.5f, 0.5f,
-            // V13: V2 repeated
-            0.5f, -0.5f, 0.5f,
-
-            // For text coords in left face
-            // V14: V0 repeated
-            -0.5f, 0.5f, 0.5f,
-            // V15: V1 repeated
-            -0.5f, -0.5f, 0.5f,
-
-            // For text coords in bottom face
-            // V16: V6 repeated
-            -0.5f, -0.5f, -0.5f,
-            // V17: V7 repeated
-            0.5f, -0.5f, -0.5f,
-            // V18: V1 repeated
-            -0.5f, -0.5f, 0.5f,
-            // V19: V2 repeated
-            0.5f, -0.5f, 0.5f
+            //FRONT FACE
+            0f,1f,0f, //0
+            0f,0f,0f, //1
+            1f,0f,0f, //2
+            1f,1f,0f, //3
+            //RIGHT FACE
+            1f,1f,0f, //4
+            1f,0f,0f, //5
+            1f,0f,1f, //6
+            1f,1f,1f, //7
+            //LEFT FACE
+            0f,1f,1f, //8
+            0f,0f,1f, //9
+            0f,0f,0f, //10
+            0f,1f,0f, //11
+            //TOP FACE
+            0f,1f,1f, //12
+            0f,1f,0f, //13
+            1f,1f,0f, //14
+            1f,1f,1f, //15
+            //BOTTOM FACE
+            1f,0f,1f, //16
+            1f,0f,0f, //17
+            0f,0f,0f, //18
+            0f,0f,1f, //19
+            //BACK FACE
+            1f,1f,1f, //20
+            1f,0f,1f, //21
+            0f,0f,1f, //22
+            0f,1f,1f //23
         )
         val indices = intArrayOf(
-            // Front face
-            0, 1, 3, 3, 1, 2,
-            // Top Face
-            8, 10, 11, 9, 8, 11,
-            // Right face
-            12, 13, 7, 5, 12, 7,
-            // Left face
-            14, 15, 6, 4, 14, 6,
-            // Bottom face
-            16, 18, 19, 17, 16, 19,
-            // Back face
-            4, 6, 7, 5, 4, 7,
+            //front
+            0,1,3,3,1,2,
+            //right
+            4,5,7,7,5,6,
+            //left
+            8,9,11,11,9,10,
+            //top
+            12,13,15,15,13,14,
+            //bottom
+            16,17,19,19,17,18,
+            //back
+            20,21,23,23,21,22
+        )
+        val normals = floatArrayOf(
+            //FRONT
+            0f,0f,-1f,
+            0f,0f,-1f,
+            0f,0f,-1f,
+            0f,0f,-1f,
+            //RIGHT
+            1f,0f,0f,
+            1f,0f,0f,
+            1f,0f,0f,
+            1f,0f,0f,
+            //LEFT
+            -1f,0f,0f,
+            -1f,0f,0f,
+            -1f,0f,0f,
+            -1f,0f,0f,
+            //TOP
+            0f,1f,0f,
+            0f,1f,0f,
+            0f,1f,0f,
+            0f,1f,0f,
+            //BOTTOM
+            0f,-1f,0f,
+            0f,-1f,0f,
+            0f,-1f,0f,
+            0f,-1f,0f,
+            //BACK
+
+            0f,0f,1f,
+            0f,0f,1f,
+            0f,0f,1f,
+            0f,0f,1f,
         )
         val uvs = floatArrayOf(
-            0.0f, 0.0f,
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-            0.5f, 0.0f,
-
-            0.0f, 0.0f,
-            0.5f, 0.0f,
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-
-            // For text coords in top face
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-            0.0f, 1.0f,
-            0.5f, 1.0f,
-
-            // For text coords in right face
-            0.0f, 0.0f,
-            0.0f, 0.5f,
-
-            // For text coords in left face
-            0.5f, 0.0f,
-            0.5f, 0.5f,
-
-            // For text coords in bottom face
-            0.5f, 0.0f,
-            1.0f, 0.0f,
-            0.5f, 0.5f,
-            1.0f, 0.5f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
+            0f,0f,0f,1f,1f,1f,1f,0f,
         )
         glBindVertexArray(vao.id)
         Loader.loadVerticesInVbo(vertexVbo, vertices)
         Loader.loadIndicesInVbo(indicesVbo, indices)
         Loader.loadUVsInVbo(textureVbo, uvs)
+        Loader.loadNormalsInVbo(normalVbo, normals)
         glBindVertexArray(0)
-        var mesh = Mesh(
+        val mesh = Mesh(
             material,
             vao,
             mutableSetOf(vertexVbo, indicesVbo, normalVbo),
@@ -194,14 +143,21 @@ class CubicWorld : GameLogic {
         )
         val gameItem = GameItem()
         gameItem.position.z += -4
-        scene = Scene(mapOf(Pair(mesh, listOf(gameItem))))
+        val pointLight = PointLight(Vector3f(1f,1f,1f),Vector3f(0f,0f,10f),1f)
+        val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
+        scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight)
         renderer = Renderer(scene)
     }
 
     override fun update() {
-        scene.gameItems.values.first().first().rotation.y += 1.5f
-        scene.gameItems.values.first().first().rotation.x += 1.5f
-        scene.gameItems.values.first().first().rotation.z += 1.5f
+        val gameItem = scene.gameItems.values.first().first()
+        val rotation = gameItem.rotation
+        rotation.x += 1.5f
+        if(rotation.x > 360)rotation.x=0f
+        rotation.y += 1.5f
+        if(rotation.y > 360)rotation.y=0f
+        rotation.z += 1.5f
+        if(rotation.z > 360)rotation.z=0f
     }
 
     override fun render() {

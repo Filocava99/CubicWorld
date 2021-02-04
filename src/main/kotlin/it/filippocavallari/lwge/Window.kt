@@ -1,6 +1,9 @@
 package it.filippocavallari.lwge
 
 import it.filippocavallari.lwge.event.*
+import it.filippocavallari.lwge.event.keyboard.KeyEvent
+import it.filippocavallari.lwge.event.keyboard.KeyPressedEvent
+import it.filippocavallari.lwge.event.keyboard.KeyReleasedEvent
 import it.filippocavallari.lwge.event.window.WindowResizedEvent
 import org.joml.Matrix4f
 import org.joml.Vector4f
@@ -61,7 +64,7 @@ class Window(
         })
         glfwSetKeyCallback(windowId,object : GLFWKeyCallback(){
             override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
-                val event: KeyEvent = when (action) {
+                val event = when (action) {
                     GLFW_PRESS -> KeyPressedEvent(key)
                     GLFW_RELEASE -> KeyReleasedEvent(key)
                     else -> KeyEvent(key, action)

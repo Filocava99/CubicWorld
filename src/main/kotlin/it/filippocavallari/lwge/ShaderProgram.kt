@@ -7,6 +7,11 @@ import org.joml.Vector4f
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.system.MemoryStack
 import java.util.*
+import it.filippocavallari.lwge.graphic.PointLight
+import it.filippocavallari.lwge.graphic.DirectionalLight
+
+
+
 
 
 class ShaderProgram {
@@ -48,9 +53,24 @@ class ShaderProgram {
         createUniform("$uniformName.diffuse")
         createUniform("$uniformName.specular")
         createUniform("$uniformName.hasTexture")
+        createUniform("$uniformName.hasNormalMap")
         createUniform("$uniformName.reflectance")
     }
 
+    fun createPointLightUniform(uniformName: String) {
+        createUniform("$uniformName.color")
+        createUniform("$uniformName.position")
+        createUniform("$uniformName.intensity")
+        createUniform("$uniformName.attenuation.constant")
+        createUniform("$uniformName.attenuation.linear")
+        createUniform("$uniformName.attenuation.exponent")
+    }
+
+    fun createDirectionalLightUniform(uniformName: String) {
+        createUniform("$uniformName.color")
+        createUniform("$uniformName.direction")
+        createUniform("$uniformName.intensity")
+    }
 
     fun setUniform(uniformName: String, value: Int) {
         glUniform1i(uniforms[uniformName]!!, value)
@@ -68,9 +88,25 @@ class ShaderProgram {
         setUniform("$uniformName.diffuse", material.diffuseColor)
         setUniform("$uniformName.specular", material.specularColor)
         setUniform("$uniformName.hasTexture", if (material.isTextured()) 1 else 0)
+        setUniform("$uniformName.hasNormalMap", if (material.hasNormalMap()) 1 else 0)
         setUniform("$uniformName.reflectance", material.reflectance)
     }
 
+    fun setUniform(uniformName: String, pointLight: PointLight) {
+        setUniform("$uniformName.color", pointLight.color)
+        setUniform("$uniformName.position", pointLight.position)
+        setUniform("$uniformName.intensity", pointLight.intensity)
+        val att = pointLight.attenuation
+        setUniform("$uniformName.attenuation.constant", att.constant)
+        setUniform("$uniformName.attenuation.linear", att.linear)
+        setUniform("$uniformName.attenuation.exponent", att.exponent)
+    }
+
+    fun setUniform(uniformName: String, directionalLight: DirectionalLight) {
+        setUniform("$uniformName.color", directionalLight.color)
+        setUniform("$uniformName.direction", directionalLight.direction)
+        setUniform("$uniformName.intensity", directionalLight.intensity)
+    }
 
     fun setUniform(uniformName: String, value: Float) {
         glUniform1f(uniforms[uniformName]!!, value)
@@ -133,9 +169,9 @@ class ShaderProgram {
             glDeleteProgram(programId)
         }
     }
-}
 
-private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
-    block(this)
-    this.close()
+    private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
+        block(this)
+        this.close()
+    }
 }

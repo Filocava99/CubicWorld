@@ -2,9 +2,12 @@ package it.filippocavallari.lwge
 
 import it.filippocavallari.lwge.graphic.Mesh
 import org.lwjgl.opengl.GL11C.*
-import org.lwjgl.opengl.GL13C.GL_TEXTURE0
-import org.lwjgl.opengl.GL13C.glActiveTexture
 import org.lwjgl.opengl.GL30C.glBindVertexArray
+import org.joml.Vector3f
+import org.joml.Vector3fc
+import org.joml.Vector4f
+import org.lwjgl.opengl.GL13C.*
+
 
 class Renderer(val scene: Scene) {
 
@@ -17,6 +20,16 @@ class Renderer(val scene: Scene) {
             shaderProgram.bind()
             shaderProgram.setUniform("texture_sampler", 0)
             shaderProgram.setUniform("projectionMatrix", GameEngine.projectionMatrix)
+            shaderProgram.setUniform("material",mesh.material)
+            var tempPos = Vector4f(scene.pointLight.position,1f).mul(camera.viewMatrix)
+            scene.pointLight.position = Vector3f(tempPos.x,tempPos.y,tempPos.z)
+            shaderProgram.setUniform("pointLight",scene.pointLight)
+            shaderProgram.setUniform("ambientLight", Vector3f(0.3f, 0.3f, 0.3f))
+            shaderProgram.setUniform("specularPower", 10f)
+            shaderProgram.setUniform("normalMap", 1);
+            tempPos = Vector4f(scene.directionalLight.direction,1f).mul(camera.viewMatrix)
+            scene.directionalLight.direction = Vector3f(tempPos.x,tempPos.y,tempPos.z)
+            shaderProgram.setUniform("directionalLight",scene.directionalLight)
             initRender(mesh)
             entry.value.forEach { gameItem ->
                 val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
@@ -32,6 +45,10 @@ class Renderer(val scene: Scene) {
         glBindVertexArray(mesh.vao.id)
         mesh.material.texture?.let {
             glActiveTexture(GL_TEXTURE0)
+            glBindTexture(GL_TEXTURE_2D, it.id)
+        }
+        mesh.material.normalMap?.let {
+            glActiveTexture(GL_TEXTURE1)
             glBindTexture(GL_TEXTURE_2D, it.id)
         }
     }
