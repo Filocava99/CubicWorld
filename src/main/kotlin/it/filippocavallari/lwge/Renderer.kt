@@ -18,7 +18,8 @@ class Renderer(val scene: Scene) {
             val mesh = entry.key
             val shaderProgram = mesh.shaderProgram
             shaderProgram.bind()
-            shaderProgram.setUniform("texture_sampler", 0)
+            shaderProgram.setUniform("cameraPos",camera.position)
+            shaderProgram.setUniform("textureSampler", 0)
             shaderProgram.setUniform("projectionMatrix", GameEngine.projectionMatrix)
             shaderProgram.setUniform("material",mesh.material)
             var tempPos = Vector4f(scene.pointLight.position,1f).mul(camera.viewMatrix)
