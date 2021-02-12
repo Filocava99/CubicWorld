@@ -2,10 +2,11 @@ package it.filippocavallari.lwge
 
 import org.joml.Matrix4f
 import org.joml.Vector3f
+import kotlin.math.cos
+import kotlin.math.sin
 
 class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector3f = Vector3f(0f, 0f, 0f)) {
     private val cameraStep = 1f
-    private val cameraMovement = Vector3f()
     val viewMatrix = Matrix4f()
 
     fun setPosition(x: Float, y: Float, z: Float) {
@@ -19,6 +20,19 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         rotation.x = x
         rotation.y = y
         rotation.z = z
+        updateViewMatrix()
+    }
+
+    fun movePosition(offsetX: Float, offsetY: Float, offsetZ: Float) {
+        if (offsetZ != 0f) {
+            position.x += sin(Math.toRadians(rotation.y.toDouble())).toFloat() * -cameraStep * offsetZ
+            position.z += cos(Math.toRadians(rotation.y.toDouble())).toFloat() * cameraStep * offsetZ
+        }
+        if (offsetX != 0f) {
+            position.x += sin(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * -cameraStep * offsetX
+            position.z += cos(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * cameraStep * offsetX
+        }
+        position.y += cameraStep * offsetY
         updateViewMatrix()
     }
 

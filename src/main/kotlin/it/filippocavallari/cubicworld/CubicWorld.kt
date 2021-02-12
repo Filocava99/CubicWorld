@@ -1,5 +1,6 @@
 package it.filippocavallari.cubicworld
 
+import it.filippocavallari.cubicworld.listener.KeyPressedListener
 import it.filippocavallari.lwge.Renderer
 import it.filippocavallari.lwge.*
 import it.filippocavallari.lwge.graphic.DirectionalLight
@@ -148,6 +149,7 @@ class CubicWorld : GameLogic {
         val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
         scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight)
         renderer = Renderer(scene)
+        GameEngine.eventBus.register(KeyPressedListener(scene.camera))
     }
 
     override fun update() {
