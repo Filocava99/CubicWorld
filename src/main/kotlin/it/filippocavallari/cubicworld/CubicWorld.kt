@@ -1,16 +1,19 @@
 package it.filippocavallari.cubicworld
 
-import it.filippocavallari.cubicworld.listener.KeyPressedListener
-import it.filippocavallari.lwge.Renderer
+import it.filippocavallari.lwge.renderer.Renderer
 import it.filippocavallari.lwge.*
-import it.filippocavallari.lwge.graphic.DirectionalLight
+import it.filippocavallari.lwge.graphic.entity.Entity
+import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.Mesh
-import it.filippocavallari.lwge.graphic.PointLight
+import it.filippocavallari.lwge.graphic.light.PointLight
+import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import it.filippocavallari.lwge.loader.Loader
 import it.filippocavallari.lwge.loader.TextureLoader
 import org.joml.Vector3f
+import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL30C.glBindVertexArray
+
 
 class CubicWorld : GameLogic {
 
@@ -24,7 +27,7 @@ class CubicWorld : GameLogic {
         shaderProgram.createFragmentShader(Util.loadResource("src/main/resources/shader.frag"))
         shaderProgram.link()
         shaderProgram.validateProgram()
-        shaderProgram.createUniform("cameraPos")
+        //shaderProgram.createUniform("cameraPos")
         shaderProgram.createUniform("textureSampler")
         shaderProgram.createUniform("normalMap")
         shaderProgram.createUniform("modelViewMatrix")
@@ -141,26 +144,47 @@ class CubicWorld : GameLogic {
             mutableSetOf(vertexVbo, indicesVbo, normalVbo),
             mutableSetOf(textureVbo),
             indices.size,
-            shaderProgram
         )
-        val gameItem = GameItem()
+        val gameItem = Entity()
         gameItem.position.z += -4
-        val pointLight = PointLight(Vector3f(1f,1f,1f),Vector3f(0f,0f,10f),1f)
+        val pointLight = PointLight(Vector3f(1f,1f,1f),Vector3f(10000f,0f,10f),1f)
         val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
-        scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight)
+        scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram)
         renderer = Renderer(scene)
-        GameEngine.eventBus.register(KeyPressedListener(scene.camera))
+    }
+
+    override fun input() {
+        val camera =  scene.camera
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_W)){
+            camera.prepareMovement(0f,0f,-1f)
+        }
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_S)){
+            camera.prepareMovement(0f,0f,1f)
+        }
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_A)){
+            camera.prepareMovement(-1f,0f,0f)
+        }
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_D)){
+            camera.prepareMovement(1f,0f,0f)
+        }
     }
 
     override fun update() {
-        val gameItem = scene.gameItems.values.first().first()
-        val rotation = gameItem.rotation
-        rotation.x += 1.5f
-        if(rotation.x > 360)rotation.x=0f
-        rotation.y += 1.5f
-        if(rotation.y > 360)rotation.y=0f
-        rotation.z += 1.5f
-        if(rotation.z > 360)rotation.z=0f
+        val camera = scene.camera
+        val MOUSE_SENSITIVITY = 0.1f
+        camera.movePosition()
+        if (GameEngine.mouseManager.rightMouseButton) {
+            val rotVec = GameEngine.mouseManager.displacementVector
+            camera.rotate(rotVec.x.toFloat() * MOUSE_SENSITIVITY, rotVec.y.toFloat() * MOUSE_SENSITIVITY, 0f)
+        }
+//        val gameItem = scene.gameItems.values.first().first()
+//        val rotation = gameItem.rotation
+//        rotation.x += 1.5f
+//        if(rotation.x > 360)rotation.x=0f
+//        rotation.y += 1.5f
+//        if(rotation.y > 360)rotation.y=0f
+//        rotation.z += 1.5f
+//        if(rotation.z > 360)rotation.z=0f
     }
 
     override fun render() {

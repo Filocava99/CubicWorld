@@ -1,5 +1,5 @@
 package it.filippocavallari.lwge.event.keyboard
 
-import org.lwjgl.glfw.GLFW
+import it.filippocavallari.lwge.event.Event
 
-class KeyReleasedEvent(override val key: Int) : KeyEvent(key, GLFW.GLFW_RELEASE)
+class KeyReleasedEvent(val key: Int) : Event()

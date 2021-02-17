@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class EventBusTest {
 
-    internal class MyEvent() : Event(1), Cancellable{
+    internal class MyEvent : Event(), Cancellable{
         override var cancelled: Boolean = false
     }
 

@@ -1,7 +1,7 @@
 package it.filippocavallari.lwge
 
-import it.filippocavallari.lwge.event.*
 import it.filippocavallari.lwge.event.keyboard.KeyEvent
+import it.filippocavallari.lwge.event.keyboard.KeyHoldEvent
 import it.filippocavallari.lwge.event.keyboard.KeyPressedEvent
 import it.filippocavallari.lwge.event.keyboard.KeyReleasedEvent
 import it.filippocavallari.lwge.event.window.WindowResizedEvent
@@ -14,11 +14,6 @@ import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import java.util.*
-import org.lwjgl.glfw.GLFW.glfwPollEvents
-
-import org.lwjgl.glfw.GLFW.glfwSwapBuffers
-
-
 
 
 class Window(
@@ -64,12 +59,12 @@ class Window(
         })
         glfwSetKeyCallback(windowId,object : GLFWKeyCallback(){
             override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
-                val event = when (action) {
-                    GLFW_PRESS -> KeyPressedEvent(key)
-                    GLFW_RELEASE -> KeyReleasedEvent(key)
-                    else -> KeyEvent(key, action)
+                when (action) {
+                    GLFW_PRESS -> GameEngine.eventBus.dispatchEvent(KeyPressedEvent(key))
+                    GLFW_RELEASE -> GameEngine.eventBus.dispatchEvent(KeyReleasedEvent(key))
+                    GLFW_REPEAT -> GameEngine.eventBus.dispatchEvent(KeyHoldEvent(key))
+                    else -> GameEngine.eventBus.dispatchEvent(KeyEvent(key, action))
                 }
-                GameEngine.eventBus.dispatchEvent(event)
             }
         })
         glfwMakeContextCurrent(windowId)

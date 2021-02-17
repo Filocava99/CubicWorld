@@ -67,7 +67,7 @@ vec4 calcLightColour(vec3 lightColor, float lightIntensity, vec3 position, vec3 
     float diffuseFactor = max(dot(normal, toLightDir), 0.0);
     calulatedDiffuseColor = diffuseColor * vec4(lightColor, 1.0) * lightIntensity * diffuseFactor;
     // Specular Light
-    vec3 cameraDirection = normalize(cameraPos - position);
+    vec3 cameraDirection = normalize(-position);
     vec3 fromLightDir = -toLightDir;
     vec3 reflectedLight = normalize(reflect(fromLightDir , normal));
     float specularFactor = max( dot(cameraDirection, reflectedLight), 0.0);

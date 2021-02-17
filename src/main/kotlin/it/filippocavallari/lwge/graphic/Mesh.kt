@@ -1,6 +1,5 @@
 package it.filippocavallari.lwge.graphic
 
-import it.filippocavallari.lwge.ShaderProgram
 import it.filippocavallari.lwge.data.Vao
 import it.filippocavallari.lwge.data.Vbo
 
@@ -10,5 +9,4 @@ data class Mesh(
     val vboSet: Set<Vbo>,
     val textureVboSet: Set<Vbo>,
     val vertexCount: Int,
-    val shaderProgram: ShaderProgram
 )

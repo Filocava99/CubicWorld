@@ -4,6 +4,8 @@ interface GameLogic {
 
     fun init()
 
+    fun input()
+
     fun update()
 
     fun render()

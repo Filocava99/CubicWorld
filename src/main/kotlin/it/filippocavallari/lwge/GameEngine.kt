@@ -1,6 +1,8 @@
 package it.filippocavallari.lwge
 
 import it.filippocavallari.lwge.event.EventBus
+import it.filippocavallari.lwge.manager.KeyboardManager
+import it.filippocavallari.lwge.manager.MouseManager
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.glfwHideWindow
@@ -12,7 +14,6 @@ class GameEngine(val gameLogic: GameLogic) {
     private val TARGET_UPS = 30 //updates per second
 
     private lateinit var window: Window
-    private lateinit var mouseManager: MouseManager
     private val timer: Timer = Timer()
 
     init{
@@ -23,6 +24,7 @@ class GameEngine(val gameLogic: GameLogic) {
             showWindow(true)
         }
         mouseManager = MouseManager(window.windowId)
+        keyboardManager = KeyboardManager(window.windowId)
         projectionMatrix = window.projectionMatrix
         gameLogic.init()
     }
@@ -71,7 +73,8 @@ class GameEngine(val gameLogic: GameLogic) {
     }
 
     private fun input() {
-
+        gameLogic.input()
+        mouseManager.input()
     }
 
     private fun update(interval: Float) {
@@ -92,5 +95,7 @@ class GameEngine(val gameLogic: GameLogic) {
     companion object{
         lateinit var projectionMatrix: Matrix4f
         val eventBus = EventBus()
+        lateinit var mouseManager: MouseManager
+        lateinit var keyboardManager: KeyboardManager
     }
 }

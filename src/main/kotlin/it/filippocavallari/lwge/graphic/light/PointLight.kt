@@ -1,4 +1,4 @@
-package it.filippocavallari.lwge.graphic
+package it.filippocavallari.lwge.graphic.light
 
 import org.joml.Vector3f
 

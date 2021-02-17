@@ -1,10 +1,10 @@
-package it.filippocavallari.lwge
+package it.filippocavallari.lwge.graphic.entity
 
-import it.filippocavallari.lwge.graphic.Mesh
+import it.filippocavallari.lwge.graphic.entity.component.Transformation
 
 import org.joml.Vector3f
 
-class GameItem {
+class Entity {
     var position = Vector3f()
     var scale = 1f
     var rotation = Vector3f()

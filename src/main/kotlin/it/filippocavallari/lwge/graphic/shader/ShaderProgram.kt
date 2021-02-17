@@ -1,4 +1,4 @@
-package it.filippocavallari.lwge
+package it.filippocavallari.lwge.graphic.shader
 
 import it.filippocavallari.lwge.graphic.Material
 import org.joml.Matrix4f
@@ -7,8 +7,8 @@ import org.joml.Vector4f
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.system.MemoryStack
 import java.util.*
-import it.filippocavallari.lwge.graphic.PointLight
-import it.filippocavallari.lwge.graphic.DirectionalLight
+import it.filippocavallari.lwge.graphic.light.PointLight
+import it.filippocavallari.lwge.graphic.light.DirectionalLight
 
 
 
