@@ -1,3 +1,5 @@
+package it.filippocavallari.lwge
+
 import it.filippocavallari.lwge.Timer
 import org.junit.jupiter.api.Test
 

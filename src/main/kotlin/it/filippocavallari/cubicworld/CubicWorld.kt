@@ -167,6 +167,12 @@ class CubicWorld : GameLogic {
         if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_D)){
             camera.prepareMovement(1f,0f,0f)
         }
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_SPACE)){
+            camera.prepareMovement(0f,1f,0f)
+        }
+        if(GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)){
+            camera.prepareMovement(0f,-1f,0f)
+        }
     }
 
     override fun update() {
