@@ -1,5 +1,6 @@
 package it.filippocavallari.cubicworld
 
+import com.google.gson.Gson
 import it.filippocavallari.lwge.renderer.Renderer
 import it.filippocavallari.lwge.*
 import it.filippocavallari.lwge.graphic.entity.Entity
@@ -37,8 +38,8 @@ class CubicWorld : GameLogic {
         shaderProgram.createDirectionalLightUniform("directionalLight")
         shaderProgram.createUniform("ambientLight")
         shaderProgram.createUniform("specularPower")
-        val texture = TextureLoader.createTexture("src/main/resources/bricks.png")
-        val normalMap = TextureLoader.createTexture("src/main/resources/bricks_n.png")
+        val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks.png")
+        val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks_n.png")
         val material = Material(texture, normalMap, reflectance = 0f)
         val vao = Loader.getVAO()
         val vertexVbo = Loader.getVBO()
@@ -183,14 +184,14 @@ class CubicWorld : GameLogic {
             val rotVec = GameEngine.mouseManager.displacementVector
             camera.rotate(rotVec.x.toFloat() * MOUSE_SENSITIVITY, rotVec.y.toFloat() * MOUSE_SENSITIVITY, 0f)
         }
-//        val gameItem = scene.gameItems.values.first().first()
-//        val rotation = gameItem.rotation
-//        rotation.x += 1.5f
-//        if(rotation.x > 360)rotation.x=0f
-//        rotation.y += 1.5f
-//        if(rotation.y > 360)rotation.y=0f
-//        rotation.z += 1.5f
-//        if(rotation.z > 360)rotation.z=0f
+        val gameItem = scene.gameItems.values.first().first()
+        val rotation = gameItem.rotation
+        rotation.x += 1.5f
+        if(rotation.x > 360)rotation.x=0f
+        rotation.y += 1.5f
+        if(rotation.y > 360)rotation.y=0f
+        rotation.z += 1.5f
+        if(rotation.z > 360)rotation.z=0f
     }
 
     override fun render() {

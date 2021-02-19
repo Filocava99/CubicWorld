@@ -1,6 +1,5 @@
 package it.filippocavallari.lwge
 
-import it.filippocavallari.lwge.Window
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.lwjgl.opengl.GL11.GL_BACK

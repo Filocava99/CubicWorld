@@ -28,6 +28,8 @@ tasks.named<Test>("test") {
 }
 
 dependencies {
+    implementation("com.google.guava:guava:30.1-jre")
+    implementation("com.google.code.gson:gson:2.8.6")
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
     implementation("org.lwjgl", "lwjgl")
