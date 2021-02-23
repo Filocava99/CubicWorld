@@ -15,6 +15,7 @@ class GameEngine(val gameLogic: GameLogic) {
 
     private lateinit var window: Window
     private val timer: Timer = Timer()
+    private var shouldClose = false
 
     init{
         window = Window("CubicWorld",1920,1080)
@@ -22,6 +23,7 @@ class GameEngine(val gameLogic: GameLogic) {
             clearColor = Vector4f(255f,0f,0f,0f)
             enableDepthTest(true)
             showWindow(true)
+            enableDebugMode(true)
         }
         mouseManager = MouseManager(window.windowId)
         keyboardManager = KeyboardManager(window.windowId)
@@ -39,12 +41,16 @@ class GameEngine(val gameLogic: GameLogic) {
         }
     }
 
+    fun stop(){
+        shouldClose = true
+    }
+
     private fun gameLoop() {
         var elapsedTime: Float
         var accumulator = 0f
         val interval = 1f / TARGET_UPS
         val running = true
-        while (running) {//&& !window.windowShouldClose()) {
+        while (running && !shouldClose) {//&& !window.windowShouldClose()) {
             elapsedTime = timer.elapsedTime
             accumulator += elapsedTime
             input()
@@ -89,7 +95,7 @@ class GameEngine(val gameLogic: GameLogic) {
     private fun cleanUp() {
         gameLogic.cleanUp()
         glfwHideWindow(window.windowId)
-        exitProcess(0)
+        //exitProcess(0)
     }
 
     companion object{
