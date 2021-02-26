@@ -14,7 +14,7 @@ import it.filippocavallari.lwge.graphic.light.DirectionalLight
 
 
 
-class ShaderProgram {
+open class ShaderProgram {
 
     private var programId = 0
     private var uniforms: MutableMap<String, Int> = HashMap()

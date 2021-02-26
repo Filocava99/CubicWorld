@@ -7,9 +7,18 @@ import kotlin.math.sin
 
 class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector3f = Vector3f(0f, 0f, 0f)) {
     private val cameraStep = 0.1f
-    private val preparedMovement : Vector3f = Vector3f()
+    private val preparedMovement: Vector3f = Vector3f()
 
     val viewMatrix = Matrix4f()
+
+    fun update() {
+        val mouseSensitivity = 0.1f
+        movePosition()
+        if (GameEngine.mouseManager.rightMouseButton) {
+            val rotVec = GameEngine.mouseManager.displacementVector
+            rotate(rotVec.x.toFloat() * mouseSensitivity, rotVec.y.toFloat() * mouseSensitivity, 0f)
+        }
+    }
 
     fun setPosition(x: Float, y: Float, z: Float) {
         position.x = x
@@ -25,14 +34,14 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         updateViewMatrix()
     }
 
-    fun rotate(x: Float, y: Float, z: Float){
+    fun rotate(x: Float, y: Float, z: Float) {
         rotation.x += x
         rotation.y += y
         rotation.z += z
         updateViewMatrix()
     }
 
-    fun prepareMovement(offsetX: Float, offsetY: Float, offsetZ: Float){
+    fun prepareMovement(offsetX: Float, offsetY: Float, offsetZ: Float) {
         preparedMovement.x += offsetX
         preparedMovement.y += offsetY
         preparedMovement.z += offsetZ
@@ -54,7 +63,7 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         updateViewMatrix()
     }
 
-    private fun updateViewMatrix(){
+    private fun updateViewMatrix() {
         // First do the rotation so camera rotates over its position
         viewMatrix.rotationX(Math.toRadians(rotation.x.toDouble()).toFloat())
             .rotateY(Math.toRadians(rotation.y.toDouble()).toFloat())
