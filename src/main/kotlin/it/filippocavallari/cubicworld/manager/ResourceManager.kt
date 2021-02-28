@@ -3,7 +3,12 @@ package it.filippocavallari.cubicworld.manager
 import it.filippocavallari.cubicworld.data.blockstate.BlockState
 import it.filippocavallari.cubicworld.data.model.Model
 import it.filippocavallari.cubicworld.json.ResourceParser
+import org.joml.Vector2f
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 class ResourceManager {
 
@@ -18,6 +23,28 @@ class ResourceManager {
         }
         blockStatesFolder.listFiles()?.forEach {
             blockStates[it.name.split(".")[0]] = ResourceParser.parseBlockState(it)
+        }
+        generateTextureAtlas()
+    }
+
+    private fun generateTextureAtlas(){
+        val textureFolder = File("src/main/resources/textures/blocks")
+        val texturesList = textureFolder.listFiles()?.filter { !it.name.endsWith("_n.png") }
+        val singleTextureSize = 128
+        val textureAtlasCoordinates = HashMap<String,Vector2f>()
+        texturesList?.let {
+            val imagePerRow = ceil(sqrt(texturesList.size.toDouble())).toInt()
+            val textureAtlasSize = imagePerRow * singleTextureSize
+            val textureAtlas = BufferedImage(textureAtlasSize, textureAtlasSize,BufferedImage.TYPE_INT_ARGB)
+            val graphics = textureAtlas.graphics
+            texturesList.forEachIndexed{index, file ->
+                val texture = ImageIO.read(file)
+                val xCoordInTextureAtlas = index%imagePerRow*singleTextureSize
+                val yCoordInTextureAtlas = index/imagePerRow*singleTextureSize
+                graphics.drawImage(texture,xCoordInTextureAtlas,yCoordInTextureAtlas,null)
+                textureAtlasCoordinates[file.name.split(".")[0]] = Vector2f(xCoordInTextureAtlas.toFloat()/textureAtlasSize,yCoordInTextureAtlas.toFloat()/textureAtlasSize)
+            }
+            ImageIO.write(textureAtlas,"png",File("src/main/resources/textures/atlas.png"))
         }
     }
 

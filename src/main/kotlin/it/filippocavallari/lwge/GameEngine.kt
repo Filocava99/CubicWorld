@@ -18,12 +18,12 @@ class GameEngine(val gameLogic: GameLogic) {
     private var shouldClose = false
 
     init{
-        window = Window("CubicWorld",1920,1080)
+        window = Window("CubicWorld",3840,2160)
         window.run {
             clearColor = Vector4f(255f,0f,0f,0f)
             enableDepthTest(true)
             showWindow(true)
-            enableDebugMode(true)
+//            enableDebugMode(true)
         }
         mouseManager = MouseManager(window.windowId)
         keyboardManager = KeyboardManager(window.windowId)

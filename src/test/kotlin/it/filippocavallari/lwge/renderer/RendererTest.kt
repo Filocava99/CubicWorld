@@ -135,7 +135,6 @@ internal class RendererTest {
                 0f,-1f,0f,
                 0f,-1f,0f,
                 //BACK
-
                 0f,0f,1f,
                 0f,0f,1f,
                 0f,0f,1f,
