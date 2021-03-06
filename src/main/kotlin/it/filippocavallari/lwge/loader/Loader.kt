@@ -100,6 +100,26 @@ object Loader {
         MemoryUtil.memFree(normalsBuffer)
     }
 
+    fun loadTangentsInVbo(vbo: Vbo, tangents: FloatArray){
+        val tangentsBuffer = MemoryUtil.memAllocFloat(tangents.size)
+        for (tangent in tangents) {
+            tangentsBuffer.put(tangent)
+        }
+        tangentsBuffer.flip()
+        loadFloatBufferInVbo(tangentsBuffer, vbo, 3, 3)
+        MemoryUtil.memFree(tangentsBuffer)
+    }
+
+    fun loadBiTangentsInVbo(vbo: Vbo, biTangents: FloatArray){
+        val biTangentsBuffer = MemoryUtil.memAllocFloat(biTangents.size)
+        for (biTangent in biTangents) {
+            biTangentsBuffer.put(biTangent)
+        }
+        biTangentsBuffer.flip()
+        loadFloatBufferInVbo(biTangentsBuffer, vbo, 3, 4)
+        MemoryUtil.memFree(biTangentsBuffer)
+    }
+
     private fun loadFloatBufferInVbo(buffer: Buffer, vbo: Vbo, size: Int, index: Int){
         glBindBuffer(GL_ARRAY_BUFFER, vbo.id)
         glBufferData(GL_ARRAY_BUFFER, buffer as FloatBuffer, GL_STATIC_DRAW)

@@ -14,24 +14,32 @@ class ResourceManager {
 
     val models = HashMap<String, Model>()
     val blockStates = HashMap<String, BlockState>()
+    val textureAtlasCoordinates = HashMap<String,Vector2f>()
 
     init{
+        loadModels()
+        loadBlockStates()
+        generateTextureAtlas()
+    }
+
+    private fun loadModels(){
         val modelsFolder = File("src/main/resources/models")
-        val blockStatesFolder = File("src/main/resources/blockstates")
         modelsFolder.listFiles()?.forEach {
             models[it.name.split(".")[0]] = ResourceParser.parseModel(it)
         }
+    }
+
+    private fun loadBlockStates(){
+        val blockStatesFolder = File("src/main/resources/blockstates")
         blockStatesFolder.listFiles()?.forEach {
             blockStates[it.name.split(".")[0]] = ResourceParser.parseBlockState(it)
         }
-        generateTextureAtlas()
     }
 
     private fun generateTextureAtlas(){
         val textureFolder = File("src/main/resources/textures/blocks")
         val texturesList = textureFolder.listFiles()?.filter { !it.name.endsWith("_n.png") }
         val singleTextureSize = 128
-        val textureAtlasCoordinates = HashMap<String,Vector2f>()
         texturesList?.let {
             val imagePerRow = ceil(sqrt(texturesList.size.toDouble())).toInt()
             val textureAtlasSize = imagePerRow * singleTextureSize

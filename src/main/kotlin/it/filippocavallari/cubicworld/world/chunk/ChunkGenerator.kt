@@ -1,8 +1,6 @@
 package it.filippocavallari.cubicworld.world.chunk
 
 import it.filippocavallari.cubicworld.noise.FastNoiseLite
-import org.joml.Matrix3f
-import org.joml.Matrix4f
 
 class ChunkGenerator(val seed: Int) {
 

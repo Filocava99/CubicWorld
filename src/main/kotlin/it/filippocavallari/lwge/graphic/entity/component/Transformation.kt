@@ -18,4 +18,15 @@ class Transformation(private val entity: Entity) {
         return modelViewMatrix
     }
 
+    fun getModelMatrix(): Matrix4f{
+        val rotation = entity.rotation
+        return Matrix4f().translate(entity.position).rotateX(
+            Math.toRadians(-rotation.x.toDouble())
+                .toFloat()
+        ).rotateY(Math.toRadians(-rotation.y.toDouble()).toFloat()).rotateZ(
+            Math.toRadians(-rotation.z.toDouble())
+                .toFloat()
+        ).scale(entity.scale)
+    }
+
 }

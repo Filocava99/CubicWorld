@@ -4,6 +4,7 @@ in vec2 outTexCoord;
 in vec3 mvVertexNormal;
 in vec3 mvVertexPos;
 in mat4 outModelViewMatrix;
+in mat3 TBN;
 
 out vec4 fragColor;
 
@@ -95,11 +96,10 @@ vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal){
 vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewMatrix)
 {
     vec3 newNormal = normal;
-    if ( material.hasNormalMap == 1 )
-    {
+    if ( material.hasNormalMap == 1 ){
         newNormal = texture(normalMap, text_coord).rgb;
-        newNormal = normalize(newNormal * 2 - 1);
-        newNormal = normalize(modelViewMatrix * vec4(newNormal, 0.0)).xyz;
+        newNormal = newNormal * 2 - 1;
+        newNormal = normalize(TBN*newNormal);
     }
     return newNormal;
 }

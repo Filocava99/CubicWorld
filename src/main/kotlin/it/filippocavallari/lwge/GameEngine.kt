@@ -13,7 +13,7 @@ class GameEngine(val gameLogic: GameLogic) {
     private val TARGET_FPS = 75 //frames per second
     private val TARGET_UPS = 30 //updates per second
 
-    private lateinit var window: Window
+
     private val timer: Timer = Timer()
     private var shouldClose = false
 
@@ -99,9 +99,18 @@ class GameEngine(val gameLogic: GameLogic) {
     }
 
     companion object{
+        private lateinit var window: Window
         lateinit var projectionMatrix: Matrix4f
         val eventBus = EventBus()
         lateinit var mouseManager: MouseManager
         lateinit var keyboardManager: KeyboardManager
+
+        fun enableDebugMode(flag: Boolean){
+            window.enableDebugMode(flag)
+        }
+
+        fun toggleDebugMode(){
+            window.enableDebugMode(!window.debug)
+        }
     }
 }

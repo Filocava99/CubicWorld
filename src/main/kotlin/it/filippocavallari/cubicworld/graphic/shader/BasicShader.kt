@@ -18,5 +18,6 @@ class BasicShader : ShaderProgram() {
         this.createDirectionalLightUniform("directionalLight")
         this.createUniform("ambientLight")
         this.createUniform("specularPower")
+        //this.createUniform("modelMatrix")
     }
 }

@@ -3,10 +3,12 @@ package it.filippocavallari.lwge.renderer
 import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.graphic.Mesh
-import org.lwjgl.opengl.GL30C.glBindVertexArray
+import it.filippocavallari.lwge.graphic.light.DirectionalLight
+import it.filippocavallari.lwge.graphic.light.PointLight
 import org.joml.Vector3f
 import org.joml.Vector4f
 import org.lwjgl.opengl.GL13C.*
+import org.lwjgl.opengl.GL30C.glBindVertexArray
 
 
 class Renderer(val scene: Scene) {
@@ -19,20 +21,36 @@ class Renderer(val scene: Scene) {
         //shaderProgram.setUniform("cameraPos",camera.position)
         shaderProgram.setUniform("textureSampler", 0)
         shaderProgram.setUniform("projectionMatrix", GameEngine.projectionMatrix)
-        shaderProgram.setUniform("pointLight",scene.pointLight)
+        shaderProgram.setUniform("pointLight", scene.pointLight)
         shaderProgram.setUniform("ambientLight", Vector3f(0.3f, 0.3f, 0.3f))
         shaderProgram.setUniform("specularPower", 10f)
         shaderProgram.setUniform("normalMap", 1)
-        val pointLightPosition = Vector4f(scene.pointLight.position,1f).mul(camera.viewMatrix)
-        val directionalLightPosition = Vector4f(scene.directionalLight.direction,1f).mul(camera.viewMatrix)
-        shaderProgram.setUniform("pointLight",scene.pointLight)
-        shaderProgram.setUniform("directionalLight",scene.directionalLight)
+        scene.directionalLight.run {
+            val directionalLightPosition = Vector4f(direction, 0f).mul(camera.viewMatrix)
+            val newDirectionalLight = DirectionalLight(
+                color,
+                Vector3f(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z),
+                intensity
+            )
+            shaderProgram.setUniform("directionalLight", newDirectionalLight)
+        }
+        scene.pointLight.run {
+            val pointLightPosition = Vector4f(position, 1f).mul(camera.viewMatrix)
+            val newPointLight = PointLight(
+                color,
+                Vector3f(pointLightPosition.x, pointLightPosition.y, pointLightPosition.z),
+                intensity,
+                attenuation
+            )
+            shaderProgram.setUniform("pointLight", newPointLight)
+        }
         scene.gameItems.forEach { entry ->
             val mesh = entry.key
-            shaderProgram.setUniform("material",mesh.material)
+            shaderProgram.setUniform("material", mesh.material)
             initRender(mesh)
             entry.value.forEach { gameItem ->
                 val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
+                //shaderProgram.setUniform("modelMatrix", gameItem.transformation.getModelMatrix())
                 shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
                 glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0)
             }

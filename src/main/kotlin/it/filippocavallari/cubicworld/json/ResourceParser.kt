@@ -4,8 +4,6 @@ import com.google.gson.Gson
 import it.filippocavallari.cubicworld.data.blockstate.BlockState
 import it.filippocavallari.cubicworld.data.model.Model
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
 
 object ResourceParser {
     private val gson = Gson()

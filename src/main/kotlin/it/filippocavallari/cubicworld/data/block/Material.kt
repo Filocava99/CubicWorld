@@ -7,4 +7,10 @@ enum class Material(val id: Int, val blockState: String) {
     DIRT(1,"dirt"),
     COBBLESTONE(2,"cobblestone"),
     BRICK(3,"brick");
+
+    companion object {
+        fun valueOf(id: Int): Material{
+            return values().filter { it.id == id }[0]
+        }
+    }
 }
