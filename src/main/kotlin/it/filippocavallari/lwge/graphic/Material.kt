@@ -5,6 +5,7 @@ import org.joml.Vector4f
 data class Material(
     val texture: Texture?,
     val normalMap: Texture?,
+    val depthMap: Texture?,
     val ambientColor: Vector4f = Vector4f(255.0f, 255.0f, 255.0f, 1.0f),
     val diffuseColor: Vector4f = Vector4f(255.0f, 255.0f, 255.0f, 1.0f),
     val specularColor: Vector4f = Vector4f(255.0f, 255.0f, 255.0f, 1.0f),
@@ -16,5 +17,9 @@ data class Material(
 
     fun hasNormalMap(): Boolean {
         return normalMap != null
+    }
+
+    fun hasDepthMap(): Boolean {
+        return depthMap != null
     }
 }

@@ -105,7 +105,7 @@ class CubicWorld : GameLogic {
 
     private fun createSkyBox(): SkyBox{
         val texture = TextureLoader.createTexture("src/main/resources/textures/skybox/skybox.png")
-        val material = Material(texture,null, reflectance = 0f)
+        val material = Material(texture,null, null,reflectance = 0f)
         val vertices = floatArrayOf(
             //FRONT FACE
             0f,1f,0f, //0

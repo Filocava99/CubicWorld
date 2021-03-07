@@ -25,6 +25,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
         shaderProgram.setUniform("pointLight", scene.pointLight)
         shaderProgram.setUniform("specularPower", 10f)
         shaderProgram.setUniform("normalMap", 1)
+        shaderProgram.setUniform("depthMap", 2)
         shaderProgram.setUniform("fog",scene.fog)
         scene.directionalLight.run {
             val directionalLightPosition = Vector4f(direction, 0f).mul(camera.viewMatrix)
@@ -68,6 +69,10 @@ class WorldRenderer(val scene: Scene) : Renderer{
         }
         mesh.material.normalMap?.let {
             glActiveTexture(GL_TEXTURE1)
+            glBindTexture(GL_TEXTURE_2D, it.id)
+        }
+        mesh.material.depthMap?.let {
+            glActiveTexture(GL_TEXTURE2)
             glBindTexture(GL_TEXTURE_2D, it.id)
         }
     }

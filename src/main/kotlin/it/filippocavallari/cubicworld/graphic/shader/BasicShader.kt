@@ -11,6 +11,7 @@ class BasicShader : ShaderProgram() {
         this.validateProgram()
         this.createUniform("textureSampler")
         this.createUniform("normalMap")
+        this.createUniform("depthMap")
         this.createUniform("modelViewMatrix")
         this.createUniform("projectionMatrix")
         this.createMaterialUniform("material")
@@ -18,7 +19,7 @@ class BasicShader : ShaderProgram() {
         this.createDirectionalLightUniform("directionalLight")
         this.createUniform("ambientLight")
         this.createUniform("specularPower")
-        this.createFogUniform("fog");
+        this.createFogUniform("fog")
         //this.createUniform("modelMatrix")
     }
 }

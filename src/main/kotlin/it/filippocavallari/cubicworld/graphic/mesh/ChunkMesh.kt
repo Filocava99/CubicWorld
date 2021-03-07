@@ -99,7 +99,8 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         glBindVertexArray(0)
         val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt.png")
         val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_n.png")
-        val material = Material(texture, normalMap, reflectance = 0f)
+        val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_h.png")
+        val material = Material(texture, normalMap, depthMap, reflectance = 0f)
         val mesh = Mesh(
             material,
             vao,
