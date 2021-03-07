@@ -6,6 +6,7 @@ import it.filippocavallari.lwge.manager.MouseManager
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.glfwHideWindow
+import org.lwjgl.opengl.GL11C.GL_BACK
 import kotlin.system.exitProcess
 
 
@@ -19,6 +20,8 @@ class GameEngine(val gameLogic: GameLogic) {
 
     init{
         window = Window("CubicWorld",3840,2160)
+        window.setCullFace(GL_BACK)
+        window.enableCullFace(true)
         window.run {
             clearColor = Vector4f(255f,0f,0f,0f)
             enableDepthTest(true)
@@ -46,11 +49,18 @@ class GameEngine(val gameLogic: GameLogic) {
     }
 
     private fun gameLoop() {
+        var rendering = 0
         var elapsedTime: Float
         var accumulator = 0f
         val interval = 1f / TARGET_UPS
         val running = true
+        var fpsTime: Float = 0f
         while (running && !shouldClose) {//&& !window.windowShouldClose()) {
+            if((System.currentTimeMillis()/1000-fpsTime)>=1){
+                fpsTime = (System.currentTimeMillis()/1000).toFloat()
+                println(rendering)
+                rendering = 0
+            }
             elapsedTime = timer.elapsedTime
             accumulator += elapsedTime
             input()
@@ -59,6 +69,7 @@ class GameEngine(val gameLogic: GameLogic) {
                 accumulator -= interval
             }
             render()
+            rendering++
             if (!window.vSync) {
                 sync()
             }

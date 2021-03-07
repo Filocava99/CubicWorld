@@ -1,32 +1,46 @@
 package it.filippocavallari.lwge.graphic.entity.component
 
-import it.filippocavallari.lwge.graphic.entity.Entity
 import org.joml.Matrix4f
+import org.joml.Vector3f
 
-class Transformation(private val entity: Entity) {
+class Transformation() {
     private val modelViewMatrix = Matrix4f()
 
+    var position = Vector3f()
+    var scale = 1f
+    var rotation = Vector3f()
+
     fun getModelViewMatrix(viewMatrix: Matrix4f): Matrix4f {
-        val rotation = entity.rotation
-        modelViewMatrix.set(viewMatrix).translate(entity.position).rotateX(
+        modelViewMatrix.set(viewMatrix).translate(position).rotateX(
             Math.toRadians(-rotation.x.toDouble())
                 .toFloat()
         ).rotateY(Math.toRadians(-rotation.y.toDouble()).toFloat()).rotateZ(
             Math.toRadians(-rotation.z.toDouble())
                 .toFloat()
-        ).scale(entity.scale)
+        ).scale(scale)
         return modelViewMatrix
     }
 
     fun getModelMatrix(): Matrix4f{
-        val rotation = entity.rotation
-        return Matrix4f().translate(entity.position).rotateX(
+        return Matrix4f().translate(position).rotateX(
             Math.toRadians(-rotation.x.toDouble())
                 .toFloat()
         ).rotateY(Math.toRadians(-rotation.y.toDouble()).toFloat()).rotateZ(
             Math.toRadians(-rotation.z.toDouble())
                 .toFloat()
-        ).scale(entity.scale)
+        ).scale(scale)
+    }
+
+    fun setPosition(x: Float, y: Float, z: Float) {
+        position.x = x
+        position.y = y
+        position.z = z
+    }
+
+    fun setRotation(x: Float, y: Float, z: Float) {
+        rotation.x = x
+        rotation.y = y
+        rotation.z = z
     }
 
 }

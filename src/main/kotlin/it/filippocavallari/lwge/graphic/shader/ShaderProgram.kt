@@ -9,6 +9,10 @@ import org.lwjgl.system.MemoryStack
 import java.util.*
 import it.filippocavallari.lwge.graphic.light.PointLight
 import it.filippocavallari.lwge.graphic.light.DirectionalLight
+import it.filippocavallari.lwge.graphic.Fog
+
+
+
 
 
 
@@ -72,6 +76,12 @@ open class ShaderProgram {
         createUniform("$uniformName.intensity")
     }
 
+    fun createFogUniform(uniformName: String) {
+        createUniform("$uniformName.enabled")
+        createUniform("$uniformName.color")
+        createUniform("$uniformName.density")
+    }
+
     fun setUniform(uniformName: String, value: Int) {
         glUniform1i(uniforms[uniformName]!!, value)
     }
@@ -118,6 +128,12 @@ open class ShaderProgram {
 
     fun setUniform(uniformName: String, value: Vector4f) {
         glUniform4f(uniforms[uniformName]!!, value.x, value.y, value.z, value.w)
+    }
+
+    fun setUniform(uniformName: String, fog: Fog) {
+        setUniform("$uniformName.enabled", if (fog.enabled) 1 else 0)
+        setUniform("$uniformName.color", fog.color)
+        setUniform("$uniformName.density", fog.density)
     }
 
     private fun createShader(shaderCode: String?, shaderType: Int): Int {

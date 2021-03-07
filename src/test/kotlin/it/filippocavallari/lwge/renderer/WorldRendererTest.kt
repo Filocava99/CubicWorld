@@ -1,5 +1,6 @@
 package it.filippocavallari.lwge.renderer
 
+import it.filippocavallari.cubicworld.graphic.renderer.WorldRenderer
 import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.GameLogic
 import it.filippocavallari.lwge.Scene
@@ -19,9 +20,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL30C
 import java.time.Instant
-import kotlin.system.exitProcess
 
-internal class RendererTest {
+internal class WorldRendererTest {
 
     lateinit var gameEngine: GameEngine
 
@@ -36,7 +36,7 @@ internal class RendererTest {
     private inner class GameLogicImpl : GameLogic{
         lateinit var shaderProgram: ShaderProgram
         lateinit var scene: Scene
-        lateinit var renderer: Renderer
+        lateinit var worldRenderer: WorldRenderer
         var start = Instant.now().epochSecond
 
         override fun init() {
@@ -161,12 +161,12 @@ internal class RendererTest {
                 mutableSetOf(textureVbo),
                 indices.size,
             )
-            val gameItem = Entity()
-            gameItem.position.z += -4
+            val gameItem = Entity(mesh)
+            gameItem.transformation.position.z += -4
             val pointLight = PointLight(Vector3f(1f,1f,1f), Vector3f(10000f,0f,10f),1f)
             val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
             scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram)
-            renderer = Renderer(scene)
+            worldRenderer = WorldRenderer(scene)
         }
 
         override fun input() {
@@ -200,7 +200,7 @@ internal class RendererTest {
                 camera.rotate(rotVec.x.toFloat() * MOUSE_SENSITIVITY, rotVec.y.toFloat() * MOUSE_SENSITIVITY, 0f)
             }
             val gameItem = scene.gameItems.values.first().first()
-            val rotation = gameItem.rotation
+            val rotation = gameItem.transformation.rotation
             rotation.x += 1.5f
             if(rotation.x > 360)rotation.x=0f
             rotation.y += 1.5f
@@ -214,7 +214,7 @@ internal class RendererTest {
             if(elapsed > 1){
                 gameEngine.stop()
             }
-            renderer.render()
+            worldRenderer.render()
         }
 
         override fun cleanUp() {

@@ -173,11 +173,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(0f, 1f, 0f))
         normalsList.add(Vector3f(0f, 1f, 0f))
@@ -216,11 +216,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(0f, -1f, 0f))
         normalsList.add(Vector3f(0f, -1f, 0f))
@@ -259,11 +259,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(0f, 0f, -1f))
         normalsList.add(Vector3f(0f, 0f, -1f))
@@ -302,11 +302,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(0f, 0f, 1f))
         normalsList.add(Vector3f(0f, 0f, 1f))
@@ -345,11 +345,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(-1f, 0f, 0f))
         normalsList.add(Vector3f(-1f, 0f, 0f))
@@ -388,11 +388,11 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         verticesList.add(pos4)
         //Indices
         indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 3)
         indicesList.add(currentVerticesListSize + 1)
+        indicesList.add(currentVerticesListSize+3)
         indicesList.add(currentVerticesListSize + 2)
+        indicesList.add(currentVerticesListSize + 1)
         //Normals
         normalsList.add(Vector3f(1f, 0f, 0f))
         normalsList.add(Vector3f(1f, 0f, 0f))

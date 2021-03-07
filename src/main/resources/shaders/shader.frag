@@ -36,6 +36,14 @@ struct Material{
     float reflectance;
 };
 
+struct Fog
+{
+    int enabled;
+    vec3 color;
+    float density;
+};
+
+uniform Fog fog;
 uniform sampler2D textureSampler;
 uniform sampler2D normalMap;
 uniform vec3 ambientLight;
@@ -61,7 +69,7 @@ void setupColors(Material material, vec2 textCoord){
     }
 }
 
-vec4 calcLightColour(vec3 lightColor, float lightIntensity, vec3 position, vec3 toLightDir, vec3 normal){
+vec4 calcLightColor(vec3 lightColor, float lightIntensity, vec3 position, vec3 toLightDir, vec3 normal){
     vec4 calulatedDiffuseColor = vec4(0, 0, 0, 0);
     vec4 calculatedSpecularColor = vec4(0, 0, 0, 0);
     // Diffuse Light
@@ -81,7 +89,7 @@ vec4 calcLightColour(vec3 lightColor, float lightIntensity, vec3 position, vec3 
 vec4 calcPointLight(PointLight light, vec3 position, vec3 normal){
     vec3 lightDirection = light.position - position;
     vec3 toLightDirection  = normalize(lightDirection);
-    vec4 lightColor = calcLightColour(light.color, light.intensity, position, toLightDirection, normal);
+    vec4 lightColor = calcLightColor(light.color, light.intensity, position, toLightDirection, normal);
     // Apply Attenuation
     float distance = length(lightDirection);
     float attenuationInv = light.attenuation.constant + light.attenuation.linear * distance +
@@ -90,11 +98,20 @@ vec4 calcPointLight(PointLight light, vec3 position, vec3 normal){
 }
 
 vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal){
-    return calcLightColour(light.color, light.intensity, position, normalize(light.direction), normal);
+    return calcLightColor(light.color, light.intensity, position, normalize(light.direction), normal);
 }
 
-vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewMatrix)
-{
+vec4 calcFog(vec3 pos, vec4 color, Fog fog, vec3 ambientLight, DirectionalLight dirLight){
+    vec3 fogColor = fog.color * (ambientLight + dirLight.color * dirLight.intensity);
+    float distance = length(pos);
+    float fogFactor = 1.0 / exp( (distance * fog.density)* (distance * fog.density));
+    fogFactor = clamp( fogFactor, 0.0, 1.0 );
+
+    vec3 resultColor = mix(fogColor, color.xyz, fogFactor);
+    return vec4(resultColor.xyz, color.w);
+}
+
+vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewMatrix){
     vec3 newNormal = normal;
     if ( material.hasNormalMap == 1 ){
         newNormal = texture(normalMap, text_coord).rgb;
@@ -110,4 +127,7 @@ void main(){
     vec4 diffuseSpecularComponent = calcDirectionalLight(directionalLight, mvVertexPos, newNormal);
     diffuseSpecularComponent += calcPointLight(pointLight,mvVertexPos, newNormal);
     fragColor = ambientColor * vec4(ambientLight,1) + diffuseSpecularComponent;
+    if(fog.enabled == 1){
+        fragColor = calcFog(mvVertexPos, fragColor, fog, ambientLight, directionalLight);
+    }
 }

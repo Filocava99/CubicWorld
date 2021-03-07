@@ -5,8 +5,8 @@ import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 
 class BasicShader : ShaderProgram() {
     init{
-        this.createVertexShader(Util.loadResource("src/main/resources/shader.vert"))
-        this.createFragmentShader(Util.loadResource("src/main/resources/shader.frag"))
+        this.createVertexShader(Util.loadResource("src/main/resources/shaders/shader.vert"))
+        this.createFragmentShader(Util.loadResource("src/main/resources/shaders/shader.frag"))
         this.link()
         this.validateProgram()
         this.createUniform("textureSampler")
@@ -18,6 +18,7 @@ class BasicShader : ShaderProgram() {
         this.createDirectionalLightUniform("directionalLight")
         this.createUniform("ambientLight")
         this.createUniform("specularPower")
+        this.createFogUniform("fog");
         //this.createUniform("modelMatrix")
     }
 }
