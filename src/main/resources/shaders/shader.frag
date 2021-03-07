@@ -1,11 +1,5 @@
 #version 330
 
-in vec2 outTexCoord;
-in vec3 mvVertexNormal;
-in vec3 mvVertexPos;
-in mat4 outModelViewMatrix;
-in mat3 TBN;
-
 out vec4 fragColor;
 
 struct Attenuation{
@@ -43,15 +37,26 @@ struct Fog
     float density;
 };
 
+struct VertexOutput{
+    vec3 tangentVertexPos;
+    PointLight pointLight;
+    DirectionalLight directionalLight;
+    mat3 TBN;
+};
+
 uniform Fog fog;
 uniform sampler2D textureSampler;
 uniform sampler2D normalMap;
 uniform vec3 ambientLight;
 uniform float specularPower;
 uniform Material material;
-uniform PointLight pointLight;
-uniform DirectionalLight directionalLight;
 uniform vec3 cameraPos;
+
+in vec2 outTexCoord;
+in vec3 mvVertexNormal;
+in vec3 mvVertexPos;
+in mat4 outModelViewMatrix;
+in VertexOutput vertexOutput;
 
 vec4 ambientColor;
 vec4 diffuseColor;
@@ -88,7 +93,7 @@ vec4 calcLightColor(vec3 lightColor, float lightIntensity, vec3 position, vec3 t
 
 vec4 calcPointLight(PointLight light, vec3 position, vec3 normal){
     vec3 lightDirection = light.position - position;
-    vec3 toLightDirection  = normalize(lightDirection);
+    vec3 toLightDirection = normalize(lightDirection);
     vec4 lightColor = calcLightColor(light.color, light.intensity, position, toLightDirection, normal);
     // Apply Attenuation
     float distance = length(lightDirection);
@@ -115,8 +120,7 @@ vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewM
     vec3 newNormal = normal;
     if ( material.hasNormalMap == 1 ){
         newNormal = texture(normalMap, text_coord).rgb;
-        newNormal = newNormal * 2 - 1;
-        newNormal = normalize(TBN*newNormal);
+        newNormal = normalize(newNormal * 2 - 1);
     }
     return newNormal;
 }
@@ -124,10 +128,10 @@ vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewM
 void main(){
     setupColors(material,outTexCoord);
     vec3 newNormal = calcNormal(material, mvVertexNormal, outTexCoord, outModelViewMatrix);
-    vec4 diffuseSpecularComponent = calcDirectionalLight(directionalLight, mvVertexPos, newNormal);
-    diffuseSpecularComponent += calcPointLight(pointLight,mvVertexPos, newNormal);
+    vec4 diffuseSpecularComponent = calcDirectionalLight(vertexOutput.directionalLight, vertexOutput.tangentVertexPos, newNormal);
+    diffuseSpecularComponent += calcPointLight(vertexOutput.pointLight,vertexOutput.tangentVertexPos, newNormal);
     fragColor = ambientColor * vec4(ambientLight,1) + diffuseSpecularComponent;
     if(fog.enabled == 1){
-        fragColor = calcFog(mvVertexPos, fragColor, fog, ambientLight, directionalLight);
+        fragColor = calcFog(vertexOutput.tangentVertexPos, fragColor, fog, ambientLight, vertexOutput.directionalLight);
     }
 }
