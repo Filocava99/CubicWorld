@@ -58,6 +58,7 @@ open class ShaderProgram {
         createUniform("$uniformName.specular")
         createUniform("$uniformName.hasTexture")
         createUniform("$uniformName.hasNormalMap")
+        createUniform("$uniformName.hasDepthMap")
         createUniform("$uniformName.reflectance")
     }
 
@@ -99,6 +100,7 @@ open class ShaderProgram {
         setUniform("$uniformName.specular", material.specularColor)
         setUniform("$uniformName.hasTexture", if (material.isTextured()) 1 else 0)
         setUniform("$uniformName.hasNormalMap", if (material.hasNormalMap()) 1 else 0)
+        setUniform("$uniformName.hasDepthMap", if (material.hasDepthMap()) 1 else 0)
         setUniform("$uniformName.reflectance", material.reflectance)
     }
 

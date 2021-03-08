@@ -24,39 +24,51 @@ struct DirectionalLight{
     float intensity;
 };
 
+struct Material{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    int hasTexture;
+    int hasNormalMap;
+    int hasDepthMap;
+    float reflectance;
+};
+
 struct VertexOutput{
-    vec3 tangentVertexPos;
+    vec3 vertexPos;
+    vec3 vertexNormal;
     PointLight pointLight;
     DirectionalLight directionalLight;
     mat3 TBN;
+    mat4 modelViewMatrix;
+    vec2 texCoord;
 };
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 uniform PointLight pointLight;
 uniform DirectionalLight directionalLight;
+uniform Material material;
 
-out mat4 outModelViewMatrix;
-out vec2 outTexCoord;
-out vec3 mvVertexNormal;
-out vec3 mvVertexPos;
 out VertexOutput vertexOutput;
 
 void main(){
-    vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPos;
-    outTexCoord = texCoord;
-    mvVertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;
-    mvVertexPos = mvPos.xyz;
-    outModelViewMatrix = modelViewMatrix;
-    vec3 N = normalize(vec3(modelViewMatrix * vec4(vertexNormal, 0.0)));
-    vec3 T = normalize(vec3(modelViewMatrix * vec4(tangent, 0.0)));
-    vec3 B = cross(N, T);
-    mat3 TBN = transpose(mat3(T, B, N));
-    vertexOutput.TBN = TBN;
+    vec4 modelViewPos = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * modelViewPos;
+    vertexOutput.texCoord = texCoord;
+    vertexOutput.vertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;
+    vertexOutput.vertexPos = modelViewPos.xyz;
+   vertexOutput.modelViewMatrix = modelViewMatrix;
     vertexOutput.directionalLight = directionalLight;
-    vertexOutput.directionalLight.direction = TBN * vertexOutput.directionalLight.direction;
     vertexOutput.pointLight = pointLight;
-    vertexOutput.pointLight.position = TBN * vertexOutput.pointLight.position;
-    vertexOutput.tangentVertexPos = TBN * mvVertexPos;
+    if(material.hasNormalMap == 1){
+        vec3 N = normalize(vec3(modelViewMatrix * vec4(vertexNormal, 0.0)));
+        vec3 T = normalize(vec3(modelViewMatrix * vec4(tangent, 0.0)));
+        vec3 B = cross(N, T);
+        mat3 TBN = transpose(mat3(T, B, N));
+        vertexOutput.TBN = TBN;
+        vertexOutput.directionalLight.direction = TBN * vertexOutput.directionalLight.direction;
+        vertexOutput.pointLight.position = TBN * vertexOutput.pointLight.position;
+        vertexOutput.vertexPos = TBN * modelViewPos.xyz;
+    }
 }
