@@ -19,7 +19,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
         val camera = scene.camera
         val shaderProgram = scene.shaderProgram
         shaderProgram.bind()
-        //shaderProgram.setUniform("cameraPos",camera.position)
+        shaderProgram.setUniform("cameraPos",camera.position)
         shaderProgram.setUniform("textureSampler", 0)
         shaderProgram.setUniform("projectionMatrix", GameEngine.projectionMatrix)
         shaderProgram.setUniform("pointLight", scene.pointLight)

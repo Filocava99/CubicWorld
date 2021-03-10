@@ -46,6 +46,7 @@ struct VertexOutput{
     mat3 TBN;
     mat4 modelViewMatrix;
     vec2 texCoord;
+    vec3 cameraPos;
 };
 
 uniform Fog fog;
@@ -128,7 +129,14 @@ vec3 calcNormal(Material material, vec3 normal, vec2 text_coord, mat4 modelViewM
 }
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
+    //METHOD ONE
+    //    float height =  texture(depthMap, texCoords).b;
+    //    vec2 p = viewDir.xy / viewDir.z * (height * heightScale);
+    //    return texCoords - p;
     // number of depth layers
+
+
+    //METHOD TWO
     const float minLayers = 8;
     const float maxLayers = 32;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
@@ -171,8 +179,8 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 void main(){
     vec2 texCoord = vertexOutput.texCoord;
     if (material.hasDepthMap == 1){
-        texCoord = parallaxMapping(vertexOutput.texCoord, normalize(-vertexOutput.vertexPos));
-        if (texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0) discard;
+        texCoord = parallaxMapping(vertexOutput.texCoord, normalize(vertexOutput.cameraPos-vertexOutput.vertexPos));
+        //if (texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0) discard;
     }
     setupColors(material, texCoord);
     vec3 newNormal = calcNormal(material, vertexOutput.vertexNormal, texCoord, vertexOutput.modelViewMatrix);

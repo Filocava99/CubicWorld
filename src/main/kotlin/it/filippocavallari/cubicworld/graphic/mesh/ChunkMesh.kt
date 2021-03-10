@@ -97,10 +97,10 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         Loader.loadTangentsInVbo(tangentsVbo, tangentsArray)
         Loader.loadBiTangentsInVbo(biTangentsVbo, biTangentsArray)
         glBindVertexArray(0)
-        val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks2.jpg")
-        val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks2_n.jpg")
-        val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks2_h.jpg")
-        val material = Material(texture, null, null, reflectance = 0f)
+        val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt.png")
+        val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_n.png")
+        val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_h.png")
+        val material = Material(texture, normalMap, null, reflectance = 0f)
         val mesh = Mesh(
             material,
             vao,

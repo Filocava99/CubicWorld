@@ -42,6 +42,7 @@ struct VertexOutput{
     mat3 TBN;
     mat4 modelViewMatrix;
     vec2 texCoord;
+    vec3 cameraPos;
 };
 
 uniform mat4 projectionMatrix;
@@ -49,6 +50,7 @@ uniform mat4 modelViewMatrix;
 uniform PointLight pointLight;
 uniform DirectionalLight directionalLight;
 uniform Material material;
+uniform vec3 cameraPos;
 
 out VertexOutput vertexOutput;
 
@@ -58,10 +60,11 @@ void main(){
     vertexOutput.texCoord = texCoord;
     vertexOutput.vertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;
     vertexOutput.vertexPos = modelViewPos.xyz;
-   vertexOutput.modelViewMatrix = modelViewMatrix;
+    vertexOutput.modelViewMatrix = modelViewMatrix;
     vertexOutput.directionalLight = directionalLight;
     vertexOutput.pointLight = pointLight;
-    if(material.hasNormalMap == 1){
+    vertexOutput.cameraPos = cameraPos;
+    if (material.hasNormalMap == 1){
         vec3 N = normalize(vec3(modelViewMatrix * vec4(vertexNormal, 0.0)));
         vec3 T = normalize(vec3(modelViewMatrix * vec4(tangent, 0.0)));
         vec3 B = cross(N, T);
@@ -70,5 +73,6 @@ void main(){
         vertexOutput.directionalLight.direction = TBN * vertexOutput.directionalLight.direction;
         vertexOutput.pointLight.position = TBN * vertexOutput.pointLight.position;
         vertexOutput.vertexPos = TBN * modelViewPos.xyz;
+        vertexOutput.cameraPos = TBN * vertexOutput.cameraPos;
     }
 }

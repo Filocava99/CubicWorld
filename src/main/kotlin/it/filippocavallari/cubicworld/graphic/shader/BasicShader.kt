@@ -9,6 +9,7 @@ class BasicShader : ShaderProgram() {
         this.createFragmentShader(Util.loadResource("src/main/resources/shaders/shader.frag"))
         this.link()
         this.validateProgram()
+        this.createUniform("cameraPos")
         this.createUniform("textureSampler")
         this.createUniform("normalMap")
         this.createUniform("depthMap")
