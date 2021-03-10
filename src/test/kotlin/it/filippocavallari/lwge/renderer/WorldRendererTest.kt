@@ -5,6 +5,7 @@ import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.GameLogic
 import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.Util
+import it.filippocavallari.lwge.graphic.Fog
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.Mesh
 import it.filippocavallari.lwge.graphic.entity.Entity
@@ -56,7 +57,7 @@ internal class WorldRendererTest {
             shaderProgram.createUniform("specularPower")
             val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks.png")
             val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/bricks_n.png")
-            val material = Material(texture, normalMap, reflectance = 0f)
+            val material = Material(texture, normalMap, null, reflectance = 0f)
             val vao = Loader.getVAO()
             val vertexVbo = Loader.getVBO()
             val indicesVbo = Loader.getVBO()
@@ -165,7 +166,7 @@ internal class WorldRendererTest {
             gameItem.transformation.position.z += -4
             val pointLight = PointLight(Vector3f(1f,1f,1f), Vector3f(10000f,0f,10f),1f)
             val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
-            scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram)
+            scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram, ambientLight = Vector3f(1f,1f,1f), fog=Fog(false,Vector3f(),0f))
             worldRenderer = WorldRenderer(scene)
         }
 
