@@ -1,6 +1,7 @@
 package it.filippocavallari.lwge.renderer
 
 import it.filippocavallari.cubicworld.graphic.renderer.WorldRenderer
+import it.filippocavallari.cubicworld.graphic.shader.SkyBoxShader
 import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.GameLogic
 import it.filippocavallari.lwge.Scene
@@ -8,6 +9,7 @@ import it.filippocavallari.lwge.Util
 import it.filippocavallari.lwge.graphic.Fog
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.Mesh
+import it.filippocavallari.lwge.graphic.SkyBox
 import it.filippocavallari.lwge.graphic.entity.Entity
 import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.light.PointLight
@@ -166,7 +168,7 @@ internal class WorldRendererTest {
             gameItem.transformation.position.z += -4
             val pointLight = PointLight(Vector3f(1f,1f,1f), Vector3f(10000f,0f,10f),1f)
             val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0.5f, -1f,0f),1f)
-            scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram, ambientLight = Vector3f(1f,1f,1f), fog=Fog(false,Vector3f(),0f))
+            scene = Scene(mapOf(Pair(mesh, listOf(gameItem))),skyBox = createSkyBox(), pointLight = pointLight, directionalLight = directionalLight, shaderProgram = shaderProgram, ambientLight = Vector3f(1f,1f,1f), fog=Fog(false,Vector3f(),0f))
             worldRenderer = WorldRenderer(scene)
         }
 
@@ -223,5 +225,117 @@ internal class WorldRendererTest {
 
     }
 
+    private fun createSkyBox(): SkyBox {
+        val texture = TextureLoader.createTexture("src/main/resources/textures/skybox/skybox.png")
+        val material = Material(texture,null, null,reflectance = 0f)
+        val vertices = floatArrayOf(
+            //FRONT FACE
+            0f,1f,0f, //0
+            0f,0f,0f, //1
+            1f,0f,0f, //2
+            1f,1f,0f, //3
+            //RIGHT FACE
+            1f,1f,0f, //4
+            1f,0f,0f, //5
+            1f,0f,1f, //6
+            1f,1f,1f, //7
+            //LEFT FACE
+            0f,1f,1f, //8
+            0f,0f,1f, //9
+            0f,0f,0f, //10
+            0f,1f,0f, //11
+            //TOP FACE
+            0f,1f,1f, //12
+            0f,1f,0f, //13
+            1f,1f,0f, //14
+            1f,1f,1f, //15
+            //BOTTOM FACE
+            1f,0f,1f, //16
+            1f,0f,0f, //17
+            0f,0f,0f, //18
+            0f,0f,1f, //19
+            //BACK FACE
+            1f,1f,1f, //20
+            1f,0f,1f, //21
+            0f,0f,1f, //22
+            0f,1f,1f //23
+        )
+        val indices = intArrayOf(
+            //front
+            0,1,3,3,1,2,
+            //right
+            4,5,7,7,5,6,
+            //left
+            8,9,11,11,9,10,
+            //top
+            12,13,15,15,13,14,
+            //bottom
+            16,17,19,19,17,18,
+            //back
+            20,21,23,23,21,22
+        )
+        val normals = floatArrayOf(
+            //FRONT
+            0f,0f,-0.5f,
+            0f,0f,-0.5f,
+            0f,0f,-0.5f,
+            0f,0f,-0.5f,
+            //RIGHT
+            0.5f,0f,0f,
+            0.5f,0f,0f,
+            0.5f,0f,0f,
+            0.5f,0f,0f,
+            //LEFT
+            -0.5f,0f,0f,
+            -0.5f,0f,0f,
+            -0.5f,0f,0f,
+            -0.5f,0f,0f,
+            //TOP
+            0f,0.5f,0f,
+            0f,0.5f,0f,
+            0f,0.5f,0f,
+            0f,0.5f,0f,
+            //BOTTOM
+            0f,-0.5f,0f,
+            0f,-0.5f,0f,
+            0f,-0.5f,0f,
+            0f,-0.5f,0f,
+            //BACK
+            0f,0f,0.5f,
+            0f,0f,0.5f,
+            0f,0f,0.5f,
+            0f,0f,0.5f,
+        )
+        val uvs = floatArrayOf(
+            //FRONT
+            0f,0f,0f,0.33f,0.33f,0.33f,0.33f,0f,
+            //RIGHT
+            0f,0.33f,0f,0.66f,0.33f,0.66f,0.33f,0.33f,
+            //LEFT
+            0.66f,0f,0.66f,0.33f,1f,0.33f,1f,0f,
+            //TOP
+            0.33f,0.33f,0.33f,0.66f,0.66f,0.66f,0.66f,0.33f,
+            //BOTTOM
+            0.66f,0.33f,0.66f,0.66f,1f,0.66f,1f,0.33f,
+            //BACK
+            0.33f,0f,0.33f,0.33f,0.66f,0.33f,0.66f,0f,
+        )
+        val vao = Loader.getVAO()
+        val verticesVbo = Loader.getVBO()
+        val normalsVbo = Loader.getVBO()
+        val uvsVbo = Loader.getVBO()
+        val indicesVbo = Loader.getVBO()
+        GL30C.glBindVertexArray(vao.id)
+        Loader.loadVerticesInVbo(verticesVbo, vertices)
+        Loader.loadNormalsInVbo(normalsVbo, normals)
+        Loader.loadUVsInVbo(uvsVbo, uvs)
+        Loader.loadIndicesInVbo(indicesVbo, indices)
+        GL30C.glBindVertexArray(0)
+        val mesh = Mesh(material,vao, setOf(verticesVbo,normalsVbo,indicesVbo), setOf(uvsVbo),vertices.size)
+        val skyBox = SkyBox(mesh, SkyBoxShader())
+        skyBox.transformation.scale = 30f
+        skyBox.transformation.setPosition(0f,0f,0f)
+        return skyBox
+    }
 
 }

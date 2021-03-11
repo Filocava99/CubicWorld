@@ -81,9 +81,9 @@ object TextureLoader {
         //Free ByteBuffer
         byteBuffer?.let { stbi_image_free(it) }
     }
-}
 
-private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
-    block(this)
-    this.close()
+    private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
+        block(this)
+        this.close()
+    }
 }

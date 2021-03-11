@@ -189,7 +189,7 @@ internal class ShaderProgramTest {
         shaderProgram.createMaterialUniform("material")
         shaderProgram.bind()
         assertDoesNotThrow {
-            shaderProgram.setUniform("material", Material(null,null,reflectance = 0f))
+            shaderProgram.setUniform("material", Material(null,null,null,reflectance = 0f))
         }
         shaderProgram.unbind()
     }
