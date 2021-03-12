@@ -48,7 +48,7 @@ class ResourceManager {
                     mesh.uvs[index] = fl+if(index%2==0) it.x else it.y
                 }
             }
-            bakeMesh(mesh)
+            //bakeMesh(mesh)
         }
     }
 

@@ -6,6 +6,7 @@ import it.filippocavallari.lwge.manager.MouseManager
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.glfwHideWindow
+import org.lwjgl.glfw.GLFW.glfwWindowShouldClose
 import org.lwjgl.opengl.GL11C.GL_BACK
 import kotlin.system.exitProcess
 
@@ -55,7 +56,7 @@ class GameEngine(val gameLogic: GameLogic) {
         val interval = 1f / TARGET_UPS
         val running = true
         var fpsTime: Float = 0f
-        while (running && !shouldClose) {//&& !window.windowShouldClose()) {
+        while (running && !glfwWindowShouldClose(window.windowId)) {//&& !window.windowShouldClose()) {
             if((System.currentTimeMillis()/1000-fpsTime)>=1){
                 fpsTime = (System.currentTimeMillis()/1000).toFloat()
                 println(rendering)

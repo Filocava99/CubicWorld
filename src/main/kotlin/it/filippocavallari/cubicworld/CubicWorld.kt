@@ -96,7 +96,7 @@ class CubicWorld : GameLogic {
 
     override fun render() {
         worldRenderer.render()
-        skyBoxRenderer.render()
+        //skyBoxRenderer.render()
     }
 
     override fun cleanUp() {
