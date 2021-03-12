@@ -198,18 +198,8 @@ class CubicWorld : GameLogic {
             //BACK
             0.33f,0f,0.33f,0.33f,0.66f,0.33f,0.66f,0f,
         )
-        val vao = Loader.getVAO()
-        val verticesVbo = Loader.getVBO()
-        val normalsVbo = Loader.getVBO()
-        val uvsVbo = Loader.getVBO()
-        val indicesVbo = Loader.getVBO()
-        GL30C.glBindVertexArray(vao.id)
-        Loader.loadVerticesInVbo(verticesVbo, vertices)
-        Loader.loadNormalsInVbo(normalsVbo, normals)
-        Loader.loadUVsInVbo(uvsVbo, uvs)
-        Loader.loadIndicesInVbo(indicesVbo, indices)
-        GL30C.glBindVertexArray(0)
-        val mesh = Mesh(material,vao, setOf(verticesVbo,normalsVbo,indicesVbo), setOf(uvsVbo),vertices.size)
+        val mesh = Mesh(vertices,indices,normals,uvs,null,material)
+        Loader.loadMesh(mesh)
         val skyBox = SkyBox(mesh,SkyBoxShader())
         skyBox.transformation.scale = 30f
         skyBox.transformation.setPosition(0f,0f,0f)

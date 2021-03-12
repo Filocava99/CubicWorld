@@ -102,12 +102,14 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_h.png")
         val material = Material(texture, normalMap, null, reflectance = 0f)
         val mesh = Mesh(
-            material,
-            vao,
-            mutableSetOf(verticesVbo, indicesVbo, normalsVbo),
-            mutableSetOf(uvsVbo),
-            indicesArray.size,
+            verticesArray,
+            indicesArray,
+            normalsArray,
+            uvsArray,
+            tangentsArray,
+            material
         )
+        Loader.loadMesh(mesh)
         return mesh
     }
 
@@ -284,10 +286,6 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
     }
 
     private fun addBackFace(x: Int, y: Int, z: Int, blockId: Int) {
@@ -327,10 +325,6 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
     }
 
     private fun addLeftFace(x: Int, y: Int, z: Int, blockId: Int) {
@@ -370,10 +364,6 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
     }
 
     private fun addRightFace(x: Int, y: Int, z: Int, blockId: Int) {
@@ -413,9 +403,5 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
         tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
     }
 }

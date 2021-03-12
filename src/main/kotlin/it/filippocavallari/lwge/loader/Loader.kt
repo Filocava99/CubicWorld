@@ -2,6 +2,7 @@ package it.filippocavallari.lwge.loader
 
 import it.filippocavallari.lwge.data.Vao
 import it.filippocavallari.lwge.data.Vbo
+import it.filippocavallari.lwge.graphic.Mesh
 import org.lwjgl.BufferUtils.createByteBuffer
 import org.lwjgl.opengl.GL32C.*
 import org.lwjgl.system.MemoryUtil
@@ -59,6 +60,32 @@ object Loader {
 
     private fun createVBO(){
         VBOsPool.add(Vbo(glGenBuffers()))
+    }
+
+    fun loadMesh(mesh: Mesh){
+        val vao = getVAO()
+        mesh.vao = vao
+        glBindVertexArray(vao.id)
+        val verticesVbo = getVBO()
+        mesh.vboSet.add(verticesVbo)
+        loadVerticesInVbo(verticesVbo,mesh.vertices)
+        val indicesVbo = getVBO()
+        mesh.vboSet.add(indicesVbo)
+        loadIndicesInVbo(indicesVbo, mesh.indices)
+        val normalsVbo = getVBO()
+        mesh.vboSet.add(normalsVbo)
+        loadNormalsInVbo(normalsVbo, mesh.normals)
+        mesh.uvs?.let {
+            val uvsVbo = getVBO()
+            mesh.textureVboSet.add(uvsVbo)
+            loadUVsInVbo(uvsVbo, it)
+        }
+        mesh.tangents?.let{
+            val tangentsVbo = getVBO()
+            mesh.vboSet.add(tangentsVbo)
+            loadTangentsInVbo(tangentsVbo, it)
+        }
+        glBindVertexArray(0)
     }
 
     fun loadVerticesInVbo(vbo: Vbo, array: FloatArray){

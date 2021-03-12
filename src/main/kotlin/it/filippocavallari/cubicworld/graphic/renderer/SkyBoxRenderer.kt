@@ -23,7 +23,7 @@ class SkyBoxRenderer(val scene: Scene) : Renderer {
             GL13C.glActiveTexture(GL13C.GL_TEXTURE0)
             GL13C.glBindTexture(GL13C.GL_TEXTURE_2D, it.id)
         }
-        GL13C.glDrawElements(GL13C.GL_TRIANGLES, mesh.vertexCount, GL13C.GL_UNSIGNED_INT, 0)
+        GL13C.glDrawElements(GL13C.GL_TRIANGLES, mesh.vertices.size, GL13C.GL_UNSIGNED_INT, 0)
         glBindVertexArray(0)
         GL13C.glBindTexture(GL13C.GL_TEXTURE_2D, 0)
         shaderProgram.unbind()

@@ -54,7 +54,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
                 val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
                 //shaderProgram.setUniform("modelMatrix", gameItem.transformation.getModelMatrix())
                 shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
-                glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0)
+                glDrawElements(GL_TRIANGLES, mesh.vertices.size, GL_UNSIGNED_INT, 0)
             }
             endRender()
         }
