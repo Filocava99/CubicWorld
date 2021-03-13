@@ -1,5 +1,7 @@
 package it.filippocavallari.cubicworld.graphic.mesh
 
+import it.filippocavallari.cubicworld.data.block.Block
+import it.filippocavallari.cubicworld.data.block.FaceDirection
 import it.filippocavallari.cubicworld.manager.ResourceManager
 import it.filippocavallari.cubicworld.world.chunk.Chunk
 import it.filippocavallari.lwge.graphic.Material
@@ -16,12 +18,11 @@ typealias BlockMaterial = it.filippocavallari.cubicworld.data.block.Material
 
 class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
 
-    private val verticesList = LinkedList<Vector3f>()
+    private val verticesList = LinkedList<Float>()
     private val indicesList = LinkedList<Int>()
-    private val normalsList = LinkedList<Vector3f>()
-    private val uvsList = LinkedList<Vector2f>()
-    private val tangentsList = LinkedList<Vector3f>()
-    private val biTangentsList = LinkedList<Vector3f>()
+    private val normalsList = LinkedList<Float>()
+    private val uvsList = LinkedList<Float>()
+    private val tangentsList = LinkedList<Float>()
 
     fun buildMesh(): Mesh {
         for (x in 0..15) {
@@ -30,76 +31,35 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
                     val blockId = chunk.getBlock(x, y, z)
                     if (blockId != 0) {
                         if (isTopFaceVisible(x, y, z)) {
-                            addTopFace(x, y, z, blockId)
+                            addFace(FaceDirection.UP,blockId)
                         }
                         if (isBottomFaceVisible(x, y, z)) {
-                            addBottomFace(x, y, z, blockId)
+                            addFace(FaceDirection.DOWN, blockId)
                         }
                         if (isFrontFaceVisible(x, y, z)) {
-                            addFrontFace(x, y, z, blockId)
+                            addFace(FaceDirection.SOUTH, blockId)
                         }
                         if (isBackFaceVisible(x, y, z)) {
-                            addBackFace(x, y, z, blockId)
+                            addFace(FaceDirection.NORTH, blockId)
                         }
                         if (isLeftFaceVisible(x, y, z)) {
-                            addLeftFace(x, y, z, blockId)
+                            addFace(FaceDirection.WEST, blockId)
                         }
                         if (isRightFaceVisible(x, y, z)) {
-                            addRightFace(x, y, z, blockId)
+                            addFace(FaceDirection.EAST, blockId)
                         }
                     }
                 }
             }
         }
-        val verticesArray = FloatArray(verticesList.size * 3)
-        verticesList.forEachIndexed { index, vector3f ->
-            verticesArray[index * 3] = vector3f.x
-            verticesArray[index * 3 + 1] = vector3f.y
-            verticesArray[index * 3 + 2] = vector3f.z
-        }
-        val indicesArray = IntArray(indicesList.size)
-        indicesList.forEachIndexed { index, int -> indicesArray[index] = int }
-        val normalsArray = FloatArray(normalsList.size * 3)
-        normalsList.forEachIndexed { index, vector3f ->
-            normalsArray[index * 3] = vector3f.x
-            normalsArray[index * 3 + 1] = vector3f.y
-            normalsArray[index * 3 + 2] = vector3f.z
-        }
-        val uvsArray = FloatArray(uvsList.size * 2)
-        uvsList.forEachIndexed { index, vector2f ->
-            uvsArray[index * 2] = vector2f.x
-            uvsArray[index * 2 + 1] = vector2f.y
-        }
-        val tangentsArray = FloatArray(tangentsList.size * 3)
-        tangentsList.forEachIndexed { index, vector3f ->
-            tangentsArray[index * 3] = vector3f.x
-            tangentsArray[index * 3 + 1] = vector3f.y
-            tangentsArray[index * 3 + 2] = vector3f.z
-        }
-        val biTangentsArray = FloatArray(biTangentsList.size * 3)
-        biTangentsList.forEachIndexed { index, vector3f ->
-            biTangentsArray[index * 3] = vector3f.x
-            biTangentsArray[index * 3 + 1] = vector3f.y
-            biTangentsArray[index * 3 + 2] = vector3f.z
-        }
-        val vao = Loader.getVAO()
-        val verticesVbo = Loader.getVBO()
-        val indicesVbo = Loader.getVBO()
-        val normalsVbo = Loader.getVBO()
-        val uvsVbo = Loader.getVBO()
-        val tangentsVbo = Loader.getVBO()
-        val biTangentsVbo = Loader.getVBO()
-        glBindVertexArray(vao.id)
-        Loader.loadVerticesInVbo(verticesVbo, verticesArray)
-        Loader.loadIndicesInVbo(indicesVbo, indicesArray)
-        Loader.loadNormalsInVbo(normalsVbo, normalsArray)
-        Loader.loadUVsInVbo(uvsVbo, uvsArray)
-        Loader.loadTangentsInVbo(tangentsVbo, tangentsArray)
-        Loader.loadBiTangentsInVbo(biTangentsVbo, biTangentsArray)
-        glBindVertexArray(0)
-        val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt.png")
-        val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_n.png")
-        val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_h.png")
+        val verticesArray = verticesList.toFloatArray()
+        val indicesArray = indicesList.toIntArray()
+        val normalsArray = normalsList.toFloatArray()
+        val uvsArray = uvsList.toFloatArray()
+        val tangentsArray = tangentsList.toFloatArray()
+        val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas.png")
+        val normalMap = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas_n.png")
+        //val depthMap = TextureLoader.createTexture("src/main/resources/textures/blocks/dirt_h.png")
         val material = Material(texture, normalMap, null, reflectance = 0f)
         val mesh = Mesh(
             verticesArray,
@@ -163,245 +123,18 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         }
     }
 
-    private fun addTopFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(-0.5f + x, 0.5f + y, 0.5f + z)
-        val pos2 = Vector3f(-0.5f + x, 0.5f + y, -0.5f + z)
-        val pos3 = Vector3f(0.5f + x, 0.5f + y, -0.5f + z)
-        val pos4 = Vector3f(0.5f + x, 0.5f + y, 0.5f + z)
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(0f, 1f, 0f))
-        normalsList.add(Vector3f(0f, 1f, 0f))
-        normalsList.add(Vector3f(0f, 1f, 0f))
-        normalsList.add(Vector3f(0f, 1f, 0f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-    }
-
-    private fun addBottomFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(Vector3f(-0.5f + x, -0.5f + y, -0.5f + z))
-        val pos2 = Vector3f(Vector3f(-0.5f + x, -0.5f + y, 0.5f + z))
-        val pos3 = Vector3f(Vector3f(0.5f + x, -0.5f + y, 0.5f + z))
-        val pos4 = Vector3f(Vector3f(0.5f + x, -0.5f + y, -0.5f + z))
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(0f, -1f, 0f))
-        normalsList.add(Vector3f(0f, -1f, 0f))
-        normalsList.add(Vector3f(0f, -1f, 0f))
-        normalsList.add(Vector3f(0f, -1f, 0f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-        biTangentsList.add(tangents1.biTangent)
-    }
-
-    private fun addFrontFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(-0.5f + x, 0.5f + y, -0.5f + z)
-        val pos2 = Vector3f(-0.5f + x, -0.5f + y, -0.5f + z)
-        val pos3 = Vector3f(0.5f + x, -0.5f + y, -0.5f + z)
-        val pos4 = Vector3f(0.5f + x, 0.5f + y, -0.5f + z)
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(0f, 0f, -1f))
-        normalsList.add(Vector3f(0f, 0f, -1f))
-        normalsList.add(Vector3f(0f, 0f, -1f))
-        normalsList.add(Vector3f(0f, 0f, -1f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-    }
-
-    private fun addBackFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(0.5f + x, 0.5f + y, 0.5f + z)
-        val pos2 = Vector3f(0.5f + x, -0.5f + y, 0.5f + z)
-        val pos3 = Vector3f(-0.5f + x, -0.5f + y, 0.5f + z)
-        val pos4 = Vector3f(-0.5f + x, 0.5f + y, 0.5f + z)
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(0f, 0f, 1f))
-        normalsList.add(Vector3f(0f, 0f, 1f))
-        normalsList.add(Vector3f(0f, 0f, 1f))
-        normalsList.add(Vector3f(0f, 0f, 1f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-    }
-
-    private fun addLeftFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(-0.5f + x, 0.5f + y, 0.5f + z)
-        val pos2 = Vector3f(-0.5f + x, -0.5f + y, 0.5f + z)
-        val pos3 = Vector3f(-0.5f + x, -0.5f + y, -0.5f + z)
-        val pos4 = Vector3f(-0.5f + x, 0.5f + y, -0.5f + z)
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(-1f, 0f, 0f))
-        normalsList.add(Vector3f(-1f, 0f, 0f))
-        normalsList.add(Vector3f(-1f, 0f, 0f))
-        normalsList.add(Vector3f(-1f, 0f, 0f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-    }
-
-    private fun addRightFace(x: Int, y: Int, z: Int, blockId: Int) {
-        val currentVerticesListSize = verticesList.size
-        val pos1 = Vector3f(0.5f + x, 0.5f + y, -0.5f + z)
-        val pos2 = Vector3f(0.5f + x, -0.5f + y, -0.5f + z)
-        val pos3 = Vector3f(0.5f + x, -0.5f + y, 0.5f + z)
-        val pos4 = Vector3f(0.5f + x, 0.5f + y, 0.5f + z)
-        //Vertices
-        verticesList.add(pos1)
-        verticesList.add(pos2)
-        verticesList.add(pos3)
-        verticesList.add(pos4)
-        //Indices
-        indicesList.add(currentVerticesListSize)
-        indicesList.add(currentVerticesListSize + 3)
-        indicesList.add(currentVerticesListSize + 1)
-        indicesList.add(currentVerticesListSize+3)
-        indicesList.add(currentVerticesListSize + 2)
-        indicesList.add(currentVerticesListSize + 1)
-        //Normals
-        normalsList.add(Vector3f(1f, 0f, 0f))
-        normalsList.add(Vector3f(1f, 0f, 0f))
-        normalsList.add(Vector3f(1f, 0f, 0f))
-        normalsList.add(Vector3f(1f, 0f, 0f))
-        //UVs
-        val uv1 = Vector2f(0f, 0f)
-        val uv2 = Vector2f(0f, 1f)
-        val uv3 = Vector2f(1f, 1f)
-        val uv4 = Vector2f(1f, 0f)
-        uvsList.add(uv1)
-        uvsList.add(uv2)
-        uvsList.add(uv3)
-        uvsList.add(uv4)
-        val tangents1 = Math.calculateNormalTangents(pos1,pos2,pos3,uv1,uv2,uv3)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
-        tangentsList.add(tangents1.tangent)
+    private fun addFace(faceDirection: FaceDirection, blockId: Int) {
+        val bakedModel = resourceManager.backedMeshes[BlockMaterial.valueOf(blockId)]?.faceMeshMap?.get(faceDirection)
+        bakedModel?.let {
+            val indexOffset = verticesList.size
+            verticesList.addAll(it.vertices)
+            it.indices.forEach{ index ->
+                indicesList.add(index+indexOffset)
+                indexOffset+1
+            }
+            normalsList.addAll(it.normals)
+            uvsList.addAll(it.uvs)
+            tangentsList.addAll(it.tangents)
+        }
     }
 }

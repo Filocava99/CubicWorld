@@ -5,4 +5,5 @@ class VBOsContainer{
     val indices = ArrayList<Int>()
     val normals = ArrayList<Float>()
     val uvs = ArrayList<Float>()
+    val tangents = ArrayList<Float>()
 }

@@ -27,13 +27,13 @@ class ResourceManager {
     val material: Material
 
     init {
-        generateTextureAtlas("src/main/resources/textures/atlas.png",Regex(".*[^_][^.]\\.png"), "src/main/resources/textures/blocks")
-        generateTextureAtlas("src/main/resources/textures/normalAtlas.png",Regex(".*_n\\.png"),"src/main/resources/textures/blocks")
-        generateTextureAtlas("src/main/resources/textures/depthAtlas.png",Regex(".*_h\\.png"),"src/main/resources/textures/blocks")
-        val texture = TextureLoader.createTexture("src/main/resources/textures/atlas.png")
-        val normalMap = TextureLoader.createTexture("src/main/resources/textures/normalAtlas.png")
-        val depthMap = TextureLoader.createTexture("src/main/resources/textures/depthAtlas.png")
-        material = Material(texture,normalMap,null,reflectance = 0f)
+//        generateTextureAtlas("src/main/resources/textures/atlas.png",Regex(".*[^_][^.]\\.png"), "src/main/resources/textures/blocks")
+//        generateTextureAtlas("src/main/resources/textures/normalAtlas.png",Regex(".*_n\\.png"),"src/main/resources/textures/blocks")
+//        generateTextureAtlas("src/main/resources/textures/depthAtlas.png",Regex(".*_h\\.png"),"src/main/resources/textures/blocks")
+//        val texture = TextureLoader.createTexture("src/main/resources/textures/atlas.png")
+//        val normalMap = TextureLoader.createTexture("src/main/resources/textures/normalAtlas.png")
+//        val depthMap = TextureLoader.createTexture("src/main/resources/textures/depthAtlas.png")
+        material = Material(null,null,null,reflectance = 0f)
         loadData()
     }
 
@@ -42,13 +42,13 @@ class ResourceManager {
         dataFolder.listFiles()?.forEach {
             val data = ResourceParser.parseDataFile(it)
             val mesh = OBJLoader.loadMesh("src/main/resources/models/${data.model}.obj",material)
-            val offset = textureAtlasCoordinates[data.texture]
-            offset?.let {
-                mesh.uvs?.forEachIndexed { index, fl ->
-                    mesh.uvs[index] = fl+if(index%2==0) it.x else it.y
-                }
-            }
-            //bakeMesh(mesh)
+//            val offset = textureAtlasCoordinates[data.texture]
+//            offset?.let {
+//                mesh.uvs?.forEachIndexed { index, fl ->
+//                    mesh.uvs[index] = fl+if(index%2==0) it.x else it.y
+//                }
+//            }
+            bakeMesh(mesh)
         }
     }
 
@@ -75,54 +75,75 @@ class ResourceManager {
         }
     }
 
-    fun bakeMesh(mesh: Mesh): BakedMesh{
+    private fun bakeMesh(mesh: Mesh): BakedMesh{
         var i = 0
         val indices = mesh.indices
         val vertices = mesh.vertices
+        //vertices.forEach { println(it) }
+        //indices.forEach { println(it) }
+        println(indices.max())
         val normals = mesh.normals
-        val uvs = mesh.uvs
+        val uvs = mesh.uvs!!
         val map = HashMap<FaceDirection, VBOsContainer>()
         while(i < mesh.indices.size){
-            val v1 = Vector3f(vertices[indices[i*3]],vertices[indices[i*3+1]],vertices[indices[i*3+2]])
-            val v2 = Vector3f(vertices[indices[(i+1)*3]],vertices[indices[(i+1)*3+1]],vertices[indices[(i+1)*3+2]])
-            val v3 = Vector3f(vertices[indices[(i+2)*3]],vertices[indices[(i+2)*3+1]],vertices[indices[(i+2)*3+2]])
-            val normal = Math.calculateSurfaceNormal(v1,v2,v3)
+            val v1x = indices[i]*3
+            val v1y = v1x+1
+            val v1z = v1x+2
+            val v1 = Vector3f(vertices[v1x],vertices[v1y],vertices[v1z])
+            val normal1 = Vector3f(normals[v1x],normals[v1y],normals[v1z])
+            val uv1 = Vector2f(uvs[indices[i]*2], uvs[indices[i]*2+1])
+            val v2x = indices[i+1]*3
+            val v2y = v2x+1
+            val v2z = v2x+2
+            val v2 = Vector3f(vertices[v2x],vertices[v2y],vertices[v2z])
+            val normal2 = Vector3f(normals[v2x],normals[v2y],normals[v2z])
+            val uv2 = Vector2f(uvs[indices[i+1]*2], uvs[indices[i+1]*2+1])
+            val v3x = indices[i+2]*3
+            val v3y = v3x+1
+            val v3z = v3x+2
+            val v3 = Vector3f(vertices[v3x],vertices[v3y],vertices[v3z])
+            val normal3 = Vector3f(normals[v3x],normals[v3y],normals[v3z])
+            val uv3 = Vector2f(uvs[indices[i+2]*2], uvs[indices[i+2]*2+1])
+            val tangent = Math.calculateNormalTangents(v1,v2,v3,uv1,uv2,uv3)
+            val surfaceNormal = Math.calculateSurfaceNormal(v1,v2,v3)
             var face = FaceDirection.NORTH
-            var prevDotProduct = normal.dot(FaceDirection.NORTH.normal)
-            var dotProduct = normal.dot(FaceDirection.SOUTH.normal)
+            var prevDotProduct = surfaceNormal.dot(FaceDirection.NORTH.normal)
+            var dotProduct = surfaceNormal.dot(FaceDirection.SOUTH.normal)
             if(dotProduct>prevDotProduct){
                 prevDotProduct = dotProduct
                 face = FaceDirection.SOUTH
+                println("south")
             }
-            dotProduct = normal.dot(FaceDirection.WEST.normal)
+            dotProduct = surfaceNormal.dot(FaceDirection.WEST.normal)
             if(dotProduct>prevDotProduct){
                 prevDotProduct = dotProduct
                 face = FaceDirection.WEST
+                println("west")
             }
-            dotProduct = normal.dot(FaceDirection.EAST.normal)
+            dotProduct = surfaceNormal.dot(FaceDirection.EAST.normal)
             if(dotProduct>prevDotProduct){
+                println("east")
                 prevDotProduct = dotProduct
                 face = FaceDirection.EAST
             }
-            dotProduct = normal.dot(FaceDirection.UP.normal)
+            dotProduct = surfaceNormal.dot(FaceDirection.UP.normal)
             if(dotProduct>prevDotProduct){
                 prevDotProduct = dotProduct
                 face = FaceDirection.UP
             }
-            dotProduct = normal.dot(FaceDirection.DOWN.normal)
+            dotProduct = surfaceNormal.dot(FaceDirection.DOWN.normal)
             if(dotProduct>prevDotProduct){
                 face = FaceDirection.DOWN
             }
             val vboContainer = map.getOrPut(face,{VBOsContainer()})
-            vboContainer.vertices.addAll(vertices.copyOfRange(i*3,(i+2)*3+3).toList())
-            vboContainer.indices.addAll(indices.copyOfRange(i,i+3).toList())
-            vboContainer.normals.addAll(normals.copyOfRange(i*3,(i+2)*3+3).toList())
-            uvs?.let {
-                vboContainer.uvs.addAll(it.copyOfRange(i*2,(i+1)*2+2).toList())
-            }
+            val indexOffset = vboContainer.vertices.size
+            vboContainer.indices.addAll(listOf(indexOffset,indexOffset+1,indexOffset+2))
+            vboContainer.vertices.addAll(listOf(v1.x,v1.y,v1.z,v2.x,v2.y,v2.z,v3.x,v3.y,v3.z))
+            vboContainer.normals.addAll(listOf(normal1.x,normal1.y,normal1.z,normal2.x,normal2.y,normal2.z,normal3.x,normal3.y,normal3.z))
+            vboContainer.uvs.addAll(listOf(uv1.x,uv1.y,uv2.x,uv2.y,uv3.x,uv3.y))
+            vboContainer.tangents.addAll(listOf(tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z))
             i+=3
         }
-        println(map[FaceDirection.NORTH]?.vertices?.size)
         return BakedMesh(map)
     }
 
