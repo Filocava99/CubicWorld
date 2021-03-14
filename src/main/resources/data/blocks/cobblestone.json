@@ -1,4 +1,6 @@
 {
+  "name": "cobblestone",
+  "id": 2,
   "model": "blocks/cobblestone",
   "texture": "blocks/cobblestone"
 }

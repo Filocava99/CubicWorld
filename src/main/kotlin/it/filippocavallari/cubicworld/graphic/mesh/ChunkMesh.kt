@@ -29,24 +29,25 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
             for (z in 0..15) {
                 for (y in 0..255) {
                     val blockId = chunk.getBlock(x, y, z)
+                    val coord = Vector3f(x.toFloat(),y.toFloat(),z.toFloat())
                     if (blockId != 0) {
                         if (isTopFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.UP,blockId)
+                            addFace(FaceDirection.UP,blockId, coord)
                         }
                         if (isBottomFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.DOWN, blockId)
+                            addFace(FaceDirection.DOWN, blockId, coord)
                         }
                         if (isFrontFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.SOUTH, blockId)
+                            addFace(FaceDirection.SOUTH, blockId, coord)
                         }
                         if (isBackFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.NORTH, blockId)
+                            addFace(FaceDirection.NORTH, blockId, coord)
                         }
                         if (isLeftFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.WEST, blockId)
+                            addFace(FaceDirection.WEST, blockId, coord)
                         }
                         if (isRightFaceVisible(x, y, z)) {
-                            addFace(FaceDirection.EAST, blockId)
+                            addFace(FaceDirection.EAST, blockId, coord)
                         }
                     }
                 }
@@ -123,11 +124,18 @@ class ChunkMesh(val chunk: Chunk, val resourceManager: ResourceManager) {
         }
     }
 
-    private fun addFace(faceDirection: FaceDirection, blockId: Int) {
+    private fun addFace(faceDirection: FaceDirection, blockId: Int, coord: Vector3f) {
         val bakedModel = resourceManager.backedMeshes[BlockMaterial.valueOf(blockId)]?.faceMeshMap?.get(faceDirection)
         bakedModel?.let {
+            println(faceDirection)
             val indexOffset = verticesList.size
-            verticesList.addAll(it.vertices)
+            var i = 0
+            while(i < bakedModel.vertices.size){
+                verticesList.add(bakedModel.vertices[i]+coord.x)
+                verticesList.add(bakedModel.vertices[i+1]+coord.y)
+                verticesList.add(bakedModel.vertices[i+2]+coord.z)
+                i+=3
+            }
             it.indices.forEach{ index ->
                 indicesList.add(index+indexOffset)
                 indexOffset+1

@@ -1,4 +1,6 @@
 {
+  "name": "dirt",
+  "id": 1,
   "model": "blocks/dirt",
   "texture": "blocks/dirt"
 }

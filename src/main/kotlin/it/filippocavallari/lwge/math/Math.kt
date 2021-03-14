@@ -37,10 +37,8 @@ object Math {
         //https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
         val U = Vector3f(v2)
         U.sub(v1)
-        println("U " + U)
         val V = Vector3f(v3)
         V.sub(v1)
-        println("V " + V)
         val normal = Vector3f(U)
         normal.cross(V)
         return normal.normalize()

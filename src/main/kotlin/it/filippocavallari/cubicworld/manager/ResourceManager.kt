@@ -1,6 +1,7 @@
 package it.filippocavallari.cubicworld.manager
 
 import it.filippocavallari.cubicworld.data.block.BakedMesh
+import it.filippocavallari.cubicworld.data.block.Block
 import it.filippocavallari.cubicworld.data.block.Data
 import it.filippocavallari.cubicworld.data.block.FaceDirection
 import it.filippocavallari.cubicworld.graphic.mesh.BlockMaterial
@@ -48,7 +49,8 @@ class ResourceManager {
 //                    mesh.uvs[index] = fl+if(index%2==0) it.x else it.y
 //                }
 //            }
-            bakeMesh(mesh)
+            backedMeshes[BlockMaterial.valueOf(data.id)] = bakeMesh(mesh)
+
         }
     }
 
@@ -79,9 +81,8 @@ class ResourceManager {
         var i = 0
         val indices = mesh.indices
         val vertices = mesh.vertices
-        //vertices.forEach { println(it) }
-        //indices.forEach { println(it) }
-        println(indices.max())
+        println(indices.size)
+        println(vertices.size)
         val normals = mesh.normals
         val uvs = mesh.uvs!!
         val map = HashMap<FaceDirection, VBOsContainer>()
@@ -112,17 +113,14 @@ class ResourceManager {
             if(dotProduct>prevDotProduct){
                 prevDotProduct = dotProduct
                 face = FaceDirection.SOUTH
-                println("south")
             }
             dotProduct = surfaceNormal.dot(FaceDirection.WEST.normal)
             if(dotProduct>prevDotProduct){
                 prevDotProduct = dotProduct
                 face = FaceDirection.WEST
-                println("west")
             }
             dotProduct = surfaceNormal.dot(FaceDirection.EAST.normal)
             if(dotProduct>prevDotProduct){
-                println("east")
                 prevDotProduct = dotProduct
                 face = FaceDirection.EAST
             }
@@ -144,6 +142,9 @@ class ResourceManager {
             vboContainer.tangents.addAll(listOf(tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z))
             i+=3
         }
+        println(map[FaceDirection.EAST]!!.vertices.size)
+        println(map[FaceDirection.SOUTH]!!.vertices.size)
+        println(map[FaceDirection.NORTH]!!.vertices.size)
         return BakedMesh(map)
     }
 

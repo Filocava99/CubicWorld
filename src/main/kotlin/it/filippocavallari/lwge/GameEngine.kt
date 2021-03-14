@@ -21,8 +21,8 @@ class GameEngine(val gameLogic: GameLogic) {
 
     init{
         window = Window("CubicWorld",3840,2160)
-        window.setCullFace(GL_BACK)
-        window.enableCullFace(true)
+//        window.setCullFace(GL_BACK)
+//        window.enableCullFace(true)
         window.run {
             clearColor = Vector4f(255f,0f,0f,0f)
             enableDepthTest(true)

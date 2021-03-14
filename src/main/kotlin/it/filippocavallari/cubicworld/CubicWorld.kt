@@ -41,7 +41,7 @@ class CubicWorld : GameLogic {
         resourceManager = ResourceManager()
         val map = HashMap<Mesh,List<Entity>>()
         val chunkGenerator = ChunkGenerator(Random.Default.nextInt())
-        val size = 10
+        val size = 1
         for(x in 0..size){
             for(z in 0..size){
                 val chunk = ChunkGenerator(Random.Default.nextInt()).generateChunk(x,z)
