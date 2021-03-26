@@ -1,0 +1,6 @@
+{
+  "name": "grass",
+  "id": 2,
+  "model": "blocks/grass",
+  "texture": "blocks/grass"
+}

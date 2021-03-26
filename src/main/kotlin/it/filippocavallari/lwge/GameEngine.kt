@@ -21,13 +21,12 @@ class GameEngine(val gameLogic: GameLogic) {
 
     init{
         window = Window("CubicWorld",3840,2160)
-//        window.setCullFace(GL_BACK)
-//        window.enableCullFace(true)
+        window.setCullFace(GL_BACK)
+        window.enableCullFace(true)
         window.run {
-            clearColor = Vector4f(255f,0f,0f,0f)
+            clearColor = Vector4f(255f,255f,255f,0f)
             enableDepthTest(true)
             showWindow(true)
-//            enableDebugMode(true)
         }
         mouseManager = MouseManager(window.windowId)
         keyboardManager = KeyboardManager(window.windowId)
@@ -55,7 +54,7 @@ class GameEngine(val gameLogic: GameLogic) {
         var accumulator = 0f
         val interval = 1f / TARGET_UPS
         val running = true
-        var fpsTime: Float = 0f
+        var fpsTime = 0f
         while (running && !glfwWindowShouldClose(window.windowId)) {//&& !window.windowShouldClose()) {
             if((System.currentTimeMillis()/1000-fpsTime)>=1){
                 fpsTime = (System.currentTimeMillis()/1000).toFloat()
@@ -66,7 +65,7 @@ class GameEngine(val gameLogic: GameLogic) {
             accumulator += elapsedTime
             input()
             while (accumulator >= interval) {
-                update(interval)
+                update(accumulator)
                 accumulator -= interval
             }
             render()
@@ -96,7 +95,7 @@ class GameEngine(val gameLogic: GameLogic) {
     }
 
     private fun update(interval: Float) {
-        gameLogic.update()
+        gameLogic.update(interval)
     }
 
     private fun render() {

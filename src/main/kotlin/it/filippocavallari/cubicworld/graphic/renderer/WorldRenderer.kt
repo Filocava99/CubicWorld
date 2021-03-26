@@ -5,6 +5,7 @@ import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.graphic.Mesh
 import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.light.PointLight
+import it.filippocavallari.lwge.graphic.water.WaterFrameBuffers
 import it.filippocavallari.lwge.renderer.Renderer
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -13,6 +14,8 @@ import org.lwjgl.opengl.GL30C.glBindVertexArray
 
 
 class WorldRenderer(val scene: Scene) : Renderer{
+
+    var clippingPlane = Vector4f(0f,0f,0f,0f)
 
     override fun render() {
         clear()
@@ -26,7 +29,9 @@ class WorldRenderer(val scene: Scene) : Renderer{
         shaderProgram.setUniform("specularPower", 10f)
         shaderProgram.setUniform("normalMap", 1)
         shaderProgram.setUniform("depthMap", 2)
+        shaderProgram.setUniform("ambientLight", scene.ambientLight)
         shaderProgram.setUniform("fog",scene.fog)
+        shaderProgram.setUniform("plane",clippingPlane)
         scene.directionalLight.run {
             val directionalLightPosition = Vector4f(direction, 0f).mul(camera.viewMatrix)
             val newDirectionalLight = DirectionalLight(
@@ -46,6 +51,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
             )
             shaderProgram.setUniform("pointLight", newPointLight)
         }
+
         scene.gameItems.forEach { entry ->
             val mesh = entry.key
             shaderProgram.setUniform("material", mesh.material)

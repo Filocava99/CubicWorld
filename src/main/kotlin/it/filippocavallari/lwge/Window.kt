@@ -31,6 +31,10 @@ class Window(
     var resized = false
     var debug: Boolean = false
     var clearColor: Vector4f = Vector4f(0f, 0f, 0f, 0f)
+    set(value) {
+        field = value
+        updateClearColor()
+    }
     var projectionMatrix: Matrix4f = Matrix4f()
     get() {
         //TODO Ha senso aggiornare ad ogni chiamata? Quanto mi costa?

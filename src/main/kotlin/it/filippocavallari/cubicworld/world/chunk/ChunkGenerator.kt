@@ -1,5 +1,6 @@
 package it.filippocavallari.cubicworld.world.chunk
 
+import it.filippocavallari.cubicworld.data.block.Material
 import it.filippocavallari.cubicworld.noise.FastNoiseLite
 
 class ChunkGenerator(val seed: Int) {
@@ -11,12 +12,19 @@ class ChunkGenerator(val seed: Int) {
     }
 
     fun generateChunk(chunkX: Int, chunkZ: Int): Chunk{
+        val waterLevel = 80
         val chunk = Chunk()
         for(x in 0..15){
             for(z in 0..15){
-                val height = sumOctave(16, chunkX*16+x, chunkZ*16+z, 0.1f,0.3f,30,70).toInt()
+                val height = sumOctave(16, chunkX*16+x, chunkZ*16+z, 0.01f,0.9f,0,100).toInt()
                 for(y in 0..height){
-                    chunk.setBlock(x,y,z,1)
+                    val blockId = if(y == height) Material.GRASS.id else if(y >= height-5) Material.DIRT.id else Material.STONE.id
+                    chunk.setBlock(x,y,z,blockId)
+                }
+                if(height <= waterLevel){
+                    for (y in height..waterLevel){
+                        chunk.setBlock(x,y,z,Material.WATER.id)
+                    }
                 }
             }
         }

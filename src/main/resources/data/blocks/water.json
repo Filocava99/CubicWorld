@@ -1,0 +1,6 @@
+{
+  "name": "water",
+  "id": 5,
+  "model": "blocks/water",
+  "texture": "blocks/water"
+}

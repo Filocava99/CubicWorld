@@ -21,6 +21,7 @@ class BasicShader : ShaderProgram() {
         this.createUniform("ambientLight")
         this.createUniform("specularPower")
         this.createFogUniform("fog")
+        this.createUniform("plane")
         //this.createUniform("modelMatrix")
     }
 }

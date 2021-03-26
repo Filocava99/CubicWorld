@@ -81,8 +81,6 @@ class ResourceManager {
         var i = 0
         val indices = mesh.indices
         val vertices = mesh.vertices
-        println(indices.size)
-        println(vertices.size)
         val normals = mesh.normals
         val uvs = mesh.uvs!!
         val map = HashMap<FaceDirection, VBOsContainer>()
@@ -134,7 +132,7 @@ class ResourceManager {
                 face = FaceDirection.DOWN
             }
             val vboContainer = map.getOrPut(face,{VBOsContainer()})
-            val indexOffset = vboContainer.vertices.size
+            val indexOffset = vboContainer.vertices.size/3
             vboContainer.indices.addAll(listOf(indexOffset,indexOffset+1,indexOffset+2))
             vboContainer.vertices.addAll(listOf(v1.x,v1.y,v1.z,v2.x,v2.y,v2.z,v3.x,v3.y,v3.z))
             vboContainer.normals.addAll(listOf(normal1.x,normal1.y,normal1.z,normal2.x,normal2.y,normal2.z,normal3.x,normal3.y,normal3.z))
@@ -142,9 +140,6 @@ class ResourceManager {
             vboContainer.tangents.addAll(listOf(tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z,tangent.x,tangent.y,tangent.z))
             i+=3
         }
-        println(map[FaceDirection.EAST]!!.vertices.size)
-        println(map[FaceDirection.SOUTH]!!.vertices.size)
-        println(map[FaceDirection.NORTH]!!.vertices.size)
         return BakedMesh(map)
     }
 

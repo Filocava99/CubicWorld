@@ -1,5 +1,6 @@
-package it.filippocavallari.lwge
+package it.filippocavallari.lwge.graphic.entity
 
+import it.filippocavallari.lwge.GameEngine
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import kotlin.math.cos
@@ -45,6 +46,10 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         preparedMovement.x += offsetX
         preparedMovement.y += offsetY
         preparedMovement.z += offsetZ
+    }
+
+    fun invertPitch(){
+        rotation.x = -rotation.x
     }
 
     fun movePosition() {

@@ -6,7 +6,7 @@ interface GameLogic {
 
     fun input()
 
-    fun update()
+    fun update(interval: Float)
 
     fun render()
 

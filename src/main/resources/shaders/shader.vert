@@ -3,7 +3,6 @@ layout (location=0) in vec3 position;
 layout (location=1) in vec2 texCoord;
 layout (location=2) in vec3 vertexNormal;
 layout (location=3) in vec3 tangent;
-layout (location=4) in vec3 biTangent;
 
 struct Attenuation{
     float constant;
@@ -51,11 +50,13 @@ uniform PointLight pointLight;
 uniform DirectionalLight directionalLight;
 uniform Material material;
 uniform vec3 cameraPos;
+uniform vec4 plane;
 
 out VertexOutput vertexOutput;
 
 void main(){
     vec4 modelViewPos = modelViewMatrix * vec4(position, 1.0);
+    gl_ClipDistance[0] = dot(modelViewPos,plane);
     gl_Position = projectionMatrix * modelViewPos;
     vertexOutput.texCoord = texCoord;
     vertexOutput.vertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;

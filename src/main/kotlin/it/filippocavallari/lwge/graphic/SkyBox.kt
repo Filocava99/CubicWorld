@@ -1,6 +1,6 @@
 package it.filippocavallari.lwge.graphic
 
-import it.filippocavallari.lwge.Camera
+import it.filippocavallari.lwge.graphic.entity.Camera
 import it.filippocavallari.lwge.graphic.entity.Entity
 import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import org.joml.Matrix4f
