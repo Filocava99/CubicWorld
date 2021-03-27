@@ -58,7 +58,7 @@ class CubicWorld : GameLogic {
         val waterEntities = HashMap<Mesh,List<Entity>>()
         for(x in 0..size){
             for(z in 0..size){
-                val chunk = chunkGenerator.generateChunk(x,z)
+                val chunk = ChunkGenerator(Random.Default.nextInt()).generateChunk(x,z)
                 val chunkMesh = ChunkMesh(chunk, material, resourceManager)
                 chunkMesh.buildMesh()
                 val mesh = chunkMesh.chunkMesh
@@ -92,7 +92,7 @@ class CubicWorld : GameLogic {
         val directionalLight = DirectionalLight(Vector3f(1f,1f,1f), Vector3f(0f, 1f,0f),1.5f)
         GameEngine.eventBus.register(KeyPressedListener())
         val skyBox = createSkyBox()
-        scene = Scene(map,skyBox = skyBox,ambientLight = Vector3f(0.3f, 0.3f, 0.3f), pointLight = pointLight, directionalLight = directionalLight, fog = Fog(true, Vector3f(0.5f,0.5f,0.5f),0.006f), shaderProgram = shaderProgram)
+        scene = Scene(map,skyBox = skyBox,ambientLight = Vector3f(0.3f, 0.3f, 0.3f), pointLight = pointLight, directionalLight = directionalLight, fog = Fog(true, Vector3f(0.5f,0.5f,0.5f),0.0006f), shaderProgram = shaderProgram)
         scene.camera.setPosition(0f,0f,0f)
         worldRenderer = WorldRenderer(scene)
         skyBoxRenderer = SkyBoxRenderer(scene)
