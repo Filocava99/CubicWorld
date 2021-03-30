@@ -12,12 +12,6 @@ import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.Fog
 
 
-
-
-
-
-
-
 open class ShaderProgram {
 
     private var programId = 0
@@ -90,7 +84,7 @@ open class ShaderProgram {
     fun setUniform(uniformName: String, value: Matrix4f) {
         // Dump the matrix into a float buffer
         MemoryStack.stackPush().use {
-            glUniformMatrix4fv(uniforms[uniformName]!!,false, value[it.mallocFloat(16)])
+            glUniformMatrix4fv(uniforms[uniformName]!!, false, value[it.mallocFloat(16)])
         }
     }
 
@@ -190,6 +184,7 @@ open class ShaderProgram {
 
     private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
         block(this)
-        this.close()
+        //this.pop()
+        MemoryStack.stackPop()
     }
 }

@@ -2,10 +2,12 @@ package it.filippocavallari.lwge.graphic
 
 import it.filippocavallari.lwge.graphic.entity.Camera
 import it.filippocavallari.lwge.graphic.entity.Entity
+import it.filippocavallari.lwge.graphic.entity.component.FrustumFilter
 import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import org.joml.Matrix4f
+import org.joml.Vector3f
 
-class SkyBox(override val mesh: Mesh, val shaderProgram: ShaderProgram) : Entity(mesh){
+class SkyBox(override val mesh: Mesh, val shaderProgram: ShaderProgram) : Entity(mesh, FrustumFilter(ignoreFrustum = true)){
 
     fun getModelViewMatrix(camera: Camera): Matrix4f{
         val viewMatrix = Matrix4f(camera.viewMatrix)

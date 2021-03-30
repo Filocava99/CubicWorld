@@ -48,6 +48,7 @@ class ChunkMesh(private val chunk: Chunk,private val material: Material, private
             waterTangentsList.toFloatArray(),
             material
         )
+        clearLists()
     }
 
     private fun addBlocks(){
@@ -165,5 +166,18 @@ class ChunkMesh(private val chunk: Chunk,private val material: Material, private
                 tangentsList.addAll(it.tangents)
             }
         }
+    }
+
+    private fun clearLists(){
+        verticesList.clear()
+        indicesList.clear()
+        normalsList.clear()
+        uvsList.clear()
+        tangentsList.clear()
+        waterVerticesList.clear()
+        waterIndicesList.clear()
+        waterNormalsList.clear()
+        waterUvsList.clear()
+        waterTangentsList.clear()
     }
 }

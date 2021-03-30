@@ -57,10 +57,12 @@ class WorldRenderer(val scene: Scene) : Renderer{
             shaderProgram.setUniform("material", mesh.material)
             initRender(mesh)
             entry.value.forEach { gameItem ->
-                val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
-                //shaderProgram.setUniform("modelMatrix", gameItem.transformation.getModelMatrix())
-                shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
-                glDrawElements(GL_TRIANGLES, mesh.vertices.size, GL_UNSIGNED_INT, 0)
+                if(gameItem.frustumFilter.insideFrustum || gameItem.frustumFilter.ignoreFrustum){
+                    val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
+                    //shaderProgram.setUniform("modelMatrix", gameItem.transformation.getModelMatrix())
+                    shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
+                    glDrawElements(GL_TRIANGLES, mesh.vertices.size, GL_UNSIGNED_INT, 0)
+                }
             }
             endRender()
         }
