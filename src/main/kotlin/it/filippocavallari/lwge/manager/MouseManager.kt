@@ -1,5 +1,6 @@
 package it.filippocavallari.lwge.manager
 
+import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.event.cursor.CursorEnteredWindowEvent
 import it.filippocavallari.lwge.event.cursor.CursorLeftWindowEvent
 import it.filippocavallari.lwge.event.cursor.CursorMovedEvent
@@ -31,6 +32,9 @@ class MouseManager(val windowId: Long) {
         glfwSetMouseButtonCallback(windowId) { _: Long, button: Int, action: Int, mode: Int ->
             leftMouseButton = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS
             rightMouseButton = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS
+            if(action == GLFW_PRESS){
+                GameEngine.eventBus.dispatchEvent(MouseButtonClickedEvent(button))
+            }
         }
     }
 
@@ -56,6 +60,11 @@ class MouseManager(val windowId: Long) {
     fun resetDisplacementVector() {
         displacementVector.x = 0.0
         displacementVector.y = 0.0
+    }
+
+    fun lockAndHideCursor(){
+        glfwSetCursorPos(windowId, 1920.0, 1080.0)
+        glfwSetInputMode(windowId, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
 }

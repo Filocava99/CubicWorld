@@ -2,6 +2,8 @@ package it.filippocavallari.cubicworld.world.chunk
 
 import it.filippocavallari.cubicworld.data.block.Material
 import it.filippocavallari.cubicworld.noise.FastNoiseLite
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.joml.Vector2i
 
 class ChunkGenerator(val seed: Int) {
@@ -15,7 +17,7 @@ class ChunkGenerator(val seed: Int) {
     fun generateChunk(chunkX: Int, chunkZ: Int): Chunk{
         val waterLevel = 80
         val chunk = Chunk(Vector2i(chunkX,chunkZ))
-        for(x in 0..15){
+        fun inFun(x: Int){
             for(z in 0..15){
                 val height = sumOctave(16, chunkX*16+x, chunkZ*16+z, 0.01f,0.8f,0,100).toInt()
                 for(y in 0..height){
@@ -26,6 +28,13 @@ class ChunkGenerator(val seed: Int) {
                     for (y in height..waterLevel){
                         chunk.setBlock(x,y,z,Material.WATER.id)
                     }
+                }
+            }
+        }
+        runBlocking {
+            for(x in 0..15){
+                launch {
+                    inFun(Integer.valueOf(x)!!)
                 }
             }
         }

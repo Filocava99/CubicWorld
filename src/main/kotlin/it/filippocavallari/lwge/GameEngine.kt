@@ -32,6 +32,7 @@ class GameEngine(val gameLogic: GameLogic) {
         keyboardManager = KeyboardManager(window.windowId)
         projectionMatrix = window.projectionMatrix
         gameLogic.init()
+        mouseManager.lockAndHideCursor()
     }
 
     fun run() {

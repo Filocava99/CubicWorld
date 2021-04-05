@@ -52,7 +52,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
             shaderProgram.setUniform("pointLight", newPointLight)
         }
 
-        scene.gameItems.forEach { entry ->
+        scene.entities.forEach { entry ->
             val mesh = entry.key
             shaderProgram.setUniform("material", mesh.material)
             initRender(mesh)

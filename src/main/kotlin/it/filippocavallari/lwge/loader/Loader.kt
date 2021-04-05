@@ -5,6 +5,7 @@ import it.filippocavallari.lwge.data.Vbo
 import it.filippocavallari.lwge.graphic.Mesh
 import org.lwjgl.BufferUtils.createByteBuffer
 import org.lwjgl.opengl.GL32C.*
+import org.lwjgl.opengl.GL43C
 import org.lwjgl.system.MemoryUtil
 import java.nio.Buffer
 import java.nio.ByteBuffer
@@ -180,6 +181,14 @@ object Loader {
         }
         buffer.flip()
         return buffer
+    }
+
+    fun clearMesh(mesh: Mesh){
+        mesh.vboSet.forEach {
+            GL43C.glInvalidateBufferData(it.id)
+            VBOsPool.add(it)
+        }
+        VAOsPool.add(mesh.vao)
     }
 
     private fun resizeBuffer(buffer: ByteBuffer, newCapacity: Int): ByteBuffer {

@@ -3,16 +3,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val lwjglVersion = "3.2.3"
 val jomlVersion = "1.10.0"
 
-val lwjglNatives = when (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem().toFamilyName()) {
+val lwjglNatives = when (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem()
+    .toFamilyName()) {
     OperatingSystemFamily.LINUX -> "natives-linux"
-    OperatingSystemFamily.MACOS  -> "natives-macos"
+    OperatingSystemFamily.MACOS -> "natives-macos"
     OperatingSystemFamily.WINDOWS -> "natives-windows"
     else -> throw Error("Unrecognized or unsupported Operating system. Please set \"lwjglNatives\" manually")
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.30"
 }
 
 group = "org.example"
@@ -23,13 +24,14 @@ repositories {
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform{
+    useJUnitPlatform {
         includeEngines("junit-jupiter")
         // excludeEngines("junit-vintage")
     }
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("com.google.guava:guava:30.1-jre")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
@@ -42,7 +44,7 @@ dependencies {
     implementation("org.lwjgl", "lwjgl-stb")
     implementation("org.junit.jupiter:junit-jupiter:5.4.2")
     implementation("org.joml", "joml", jomlVersion)
-    implementation("org.joml","joml-primitives","1.10.0")
+    implementation("org.joml", "joml-primitives", "1.10.0")
     implementation(kotlin("stdlib"))
     runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
     runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)

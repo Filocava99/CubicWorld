@@ -1,10 +1,9 @@
 package it.filippocavallari.cubicworld.graphic.renderer
 
 import it.filippocavallari.lwge.GameEngine
+import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.graphic.Mesh
 import it.filippocavallari.lwge.graphic.Texture
-import it.filippocavallari.lwge.graphic.entity.Camera
-import it.filippocavallari.lwge.graphic.entity.Entity
 import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import it.filippocavallari.lwge.graphic.water.WaterFrameBuffers
 import it.filippocavallari.lwge.loader.TextureLoader
@@ -13,19 +12,16 @@ import org.lwjgl.opengl.GL11C
 import org.lwjgl.opengl.GL13C
 import org.lwjgl.opengl.GL30C
 
-class WaterRenderer(val shaderProgram: ShaderProgram, val entities: Map<Mesh,List<Entity>>, val camera: Camera, val waterFrameBuffers: WaterFrameBuffers) : Renderer {
+@Suppress("SpellCheckingInspection")
+class WaterRenderer(val shaderProgram: ShaderProgram, val scene: Scene, val waterFrameBuffers: WaterFrameBuffers) : Renderer {
 
     private val waveSpeed = 0.03f
-    var moveFactor = 0f
+    private var moveFactor = 0f
     var interval = 0f
-
-    val dudvTexture: Texture
-    val normalMap: Texture
-
-    init {
-        dudvTexture = TextureLoader.createTexture("src/main/resources/textures/water/water_dudv.png")!!
-        normalMap = TextureLoader.createTexture("src/main/resources/textures/water/water_normal.png")!!
-    }
+    private val camera = scene.camera
+    private val entities = scene.waterEntities
+    private val dudvTexture: Texture = TextureLoader.createTexture("src/main/resources/textures/water/water_dudv.png")!!
+    private val normalMap: Texture = TextureLoader.createTexture("src/main/resources/textures/water/water_normal.png")!!
 
     override fun render() {
         moveFactor += waveSpeed * interval
