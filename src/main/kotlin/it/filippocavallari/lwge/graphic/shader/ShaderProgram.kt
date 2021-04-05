@@ -86,6 +86,7 @@ open class ShaderProgram {
         MemoryStack.stackPush().use {
             glUniformMatrix4fv(uniforms[uniformName]!!, false, value[it.mallocFloat(16)])
         }
+
     }
 
     fun setUniform(uniformName: String, material: Material) {
@@ -184,7 +185,6 @@ open class ShaderProgram {
 
     private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
         block(this)
-        //this.pop()
-        MemoryStack.stackPop()
+        this.close()
     }
 }

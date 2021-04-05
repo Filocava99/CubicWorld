@@ -24,7 +24,7 @@ class WorldManager {
 
     var selectedChunk: Chunk? = null
     var selectedBlock: Vector3i? = null
-    val viewDistance = 10
+    val viewDistance = 25
 
     fun getBlock(coordinates: Vector3f): Int {
         return getBlock(Vector3i(coordinates.x.toInt(), coordinates.y.toInt(), coordinates.z.toInt()))

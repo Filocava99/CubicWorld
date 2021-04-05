@@ -84,6 +84,6 @@ object TextureLoader {
 
     private inline fun MemoryStack.use(block: (MemoryStack) -> Unit) {
         block(this)
-        MemoryStack.stackPop()
+        this.close()
     }
 }
