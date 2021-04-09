@@ -32,9 +32,9 @@ class ChunkMesh(
     private val waterUvsList = LinkedList<Float>()
     private val waterTangentsList = LinkedList<Float>()
 
-    lateinit var chunkMesh: Mesh
+    var chunkMesh: Mesh? = null
         private set
-    lateinit var waterMesh: Mesh
+    var waterMesh: Mesh? = null
         private set
 
     fun buildMesh() {

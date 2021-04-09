@@ -57,6 +57,7 @@ class WorldRenderer(val scene: Scene) : Renderer{
             shaderProgram.setUniform("material", mesh.material)
             initRender(mesh)
             entry.value.forEach { gameItem ->
+                //println(gameItem.transformation.position)
                 if(gameItem.frustumFilter.insideFrustum || gameItem.frustumFilter.ignoreFrustum){
                     val modelViewMatrix = gameItem.transformation.getModelViewMatrix(camera.viewMatrix)
                     //shaderProgram.setUniform("modelMatrix", gameItem.transformation.getModelMatrix())

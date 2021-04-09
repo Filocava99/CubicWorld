@@ -5,9 +5,12 @@ import it.filippocavallari.lwge.data.Vbo
 import it.filippocavallari.lwge.loader.Loader
 
 class Mesh(var vertices: FloatArray, var indices: IntArray, var normals: FloatArray, var uvs: FloatArray?, var tangents: FloatArray?, val material: Material){
-    var vao: Vao = Vao(0)
-    val vboSet = HashSet<Vbo>()
-    val textureVboSet = HashSet<Vbo>()
+    lateinit var vao: Vao
+    lateinit var verticesVbo: Vbo
+    lateinit var indicesVbo: Vbo
+    lateinit var normalsVbo: Vbo
+    var uvsVbo: Vbo? = null
+    var tangentsVbo: Vbo? = null
 
     fun clearArrays(){
         vertices = FloatArray(0)
@@ -15,6 +18,10 @@ class Mesh(var vertices: FloatArray, var indices: IntArray, var normals: FloatAr
         normals = FloatArray(0)
         uvs = null
         tangents = null
+    }
+
+    fun clear(){
+        Loader.clearMesh(this)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -25,8 +32,11 @@ class Mesh(var vertices: FloatArray, var indices: IntArray, var normals: FloatAr
 
         if (material != other.material) return false
         if (vao != other.vao) return false
-        if (vboSet != other.vboSet) return false
-        if (textureVboSet != other.textureVboSet) return false
+        if (verticesVbo != other.verticesVbo) return false
+        if (indicesVbo != other.indicesVbo) return false
+        if (normalsVbo != other.normalsVbo) return false
+        if (uvsVbo != other.uvsVbo) return false
+        if (tangentsVbo != other.tangentsVbo) return false
 
         return true
     }
@@ -34,13 +44,12 @@ class Mesh(var vertices: FloatArray, var indices: IntArray, var normals: FloatAr
     override fun hashCode(): Int {
         var result = material.hashCode()
         result = 31 * result + vao.hashCode()
-        result = 31 * result + vboSet.hashCode()
-        result = 31 * result + textureVboSet.hashCode()
+        result = 31 * result + verticesVbo.hashCode()
+        result = 31 * result + indicesVbo.hashCode()
+        result = 31 * result + normalsVbo.hashCode()
+        result = 31 * result + (uvsVbo?.hashCode() ?: 0)
+        result = 31 * result + (tangentsVbo?.hashCode() ?: 0)
         return result
-    }
-
-    fun clear(){
-        Loader.clearMesh(this)
     }
 
 

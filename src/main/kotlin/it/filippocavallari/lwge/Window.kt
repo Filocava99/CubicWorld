@@ -19,7 +19,8 @@ import java.util.*
 class Window(
     val title: String,
     var width: Int,
-    var height: Int
+    var height: Int,
+    val sharingWindowId: Long = 0
 ) {
 
     private val FOV = Math.toRadians(60.0).toFloat()
@@ -52,7 +53,7 @@ class Window(
             throw IllegalStateException("Unable to initialize GLFW")
         }
         setupWindowHint()
-        windowId = glfwCreateWindow(width, height, title, 0, 0)
+        windowId = glfwCreateWindow(width, height, title, 0, sharingWindowId)
 
         glfwSetFramebufferSizeCallback(windowId, object : GLFWFramebufferSizeCallback() {
             override fun invoke(window: Long, width: Int, height: Int) {

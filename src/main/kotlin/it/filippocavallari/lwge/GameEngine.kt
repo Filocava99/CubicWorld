@@ -59,7 +59,7 @@ class GameEngine(val gameLogic: GameLogic) {
         while (running && !glfwWindowShouldClose(window.windowId)) {//&& !window.windowShouldClose()) {
             if((System.currentTimeMillis()/1000-fpsTime)>=1){
                 fpsTime = (System.currentTimeMillis()/1000).toFloat()
-                println(rendering)
+                //println(rendering)
                 rendering = 0
             }
             elapsedTime = timer.elapsedTime
@@ -123,6 +123,10 @@ class GameEngine(val gameLogic: GameLogic) {
 
         fun toggleDebugMode(){
             window.enableDebugMode(!window.debug)
+        }
+
+        fun getMainWindowId(): Long{
+            return window.windowId
         }
     }
 }

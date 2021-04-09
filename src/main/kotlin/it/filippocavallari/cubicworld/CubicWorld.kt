@@ -12,14 +12,13 @@ import it.filippocavallari.cubicworld.listener.keyboard.DebugModeKeyPressedListe
 import it.filippocavallari.cubicworld.listener.mouse.MouseClickListener
 import it.filippocavallari.cubicworld.listener.player.PlayerChangedChunkListener
 import it.filippocavallari.cubicworld.manager.ResourceManager
-import it.filippocavallari.cubicworld.world.chunk.ChunkGenerator
 import it.filippocavallari.cubicworld.world.chunk.WorldManager
 import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.GameLogic
 import it.filippocavallari.lwge.Scene
+import it.filippocavallari.lwge.Window
 import it.filippocavallari.lwge.graphic.Fog
 import it.filippocavallari.lwge.graphic.Material
-import it.filippocavallari.lwge.graphic.Mesh
 import it.filippocavallari.lwge.graphic.SkyBox
 import it.filippocavallari.lwge.graphic.entity.Entity
 import it.filippocavallari.lwge.graphic.entity.component.FrustumFilter
@@ -28,23 +27,17 @@ import it.filippocavallari.lwge.graphic.light.PointLight
 import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import it.filippocavallari.lwge.graphic.water.WaterFrameBuffers
 import it.filippocavallari.lwge.loader.Loader
+import it.filippocavallari.lwge.loader.OBJLoader
 import it.filippocavallari.lwge.loader.TextureLoader
 import it.filippocavallari.lwge.math.FrustumCullingFilter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.joml.Vector2i
 import org.joml.Vector3f
-import org.joml.Vector3i
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL11C
 import org.lwjgl.opengl.GL30C
-import org.lwjgl.opengl.WGL
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 class CubicWorld : GameLogic {
 
@@ -59,20 +52,23 @@ class CubicWorld : GameLogic {
 
     var chunksMeshes = HashMap<Vector2i, ChunkMesh>()
     var chunkMeshesToBeLoaded = ConcurrentLinkedQueue<ChunkMesh>()
+    var chunkMeshesToBeRendered = ConcurrentLinkedQueue<ChunkMesh>()
+    var chunkMeshesToBeUnloaded = ConcurrentLinkedQueue<ChunkMesh>()
     var interval = 0f
 
     private val entitiesInsideFrustum = HashSet<Entity>()
     private val worldManager = WorldManager()
 
     override fun init() {
-        Loader.createVAOs(300)
-        Loader.createVBOs(1000)
+        runThread()
+//        Loader.createVAOs(300)
+//        Loader.createVBOs(1000)
         shaderProgram = BasicShader()
         resourceManager = ResourceManager()
         val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas.png")
         val normal = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas_n.png")
         material = Material(texture, normal, null, Vector4f(1f, 1f, 1f, 1f), reflectance = 0f)
-        worldManager.updateActiveChunks(Vector2i(0,0))
+        worldManager.updateActiveChunks(Vector2i(0, 0))
         val pointLight = PointLight(Vector3f(1f, 1f, 1f), Vector3f(10000f, 0f, 10f), 1f)
         val directionalLight = DirectionalLight(Vector3f(1f, 1f, 1f), Vector3f(0f, 1f, 0f), 1.5f)
         GameEngine.eventBus.register(DebugModeKeyPressedListener())
@@ -116,9 +112,9 @@ class CubicWorld : GameLogic {
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             camera.prepareMovement(0f, -1f * flySpeed, 0f)
         }
-        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f,-2f,0f)
-        if(worldManager.getBlock(newDestination) != BlockMaterial.AIR.id){
-           scene.camera.preparedMovement.zero()
+        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f, -2f, 0f)
+        if (worldManager.getBlock(newDestination) != BlockMaterial.AIR.id) {
+            scene.camera.preparedMovement.zero()
         }
     }
 
@@ -127,56 +123,78 @@ class CubicWorld : GameLogic {
         this.interval = interval
         camera.update()
         worldManager.updateSelectedBlock(camera)
-        while (worldManager.recentlyRemovedChunks.isNotEmpty()){
+        while (worldManager.recentlyRemovedChunks.isNotEmpty()) {
             val chunk = worldManager.recentlyRemovedChunks.poll()
             val chunkMesh = chunksMeshes.remove(chunk.position)
             scene.entities.remove(chunkMesh?.chunkMesh)
             scene.waterEntities.remove(chunkMesh?.waterMesh)
+            chunkMeshesToBeUnloaded.add(chunkMesh)
         }
-        while(worldManager.recentModifiedChunks.isNotEmpty()){
+        while (worldManager.recentModifiedChunks.isNotEmpty()) {
             val chunk = worldManager.recentModifiedChunks.poll()
             chunk?.let {
                 val chunkPosition = it.position
-                var chunkMesh = chunksMeshes.remove(chunkPosition)
-                scene.entities.remove(chunkMesh?.chunkMesh)
-                scene.waterEntities.remove(chunkMesh?.chunkMesh)
-                chunkMesh?.chunkMesh?.clear()
-                chunkMesh?.waterMesh?.clear()
-                chunkMesh = ChunkMesh(it,material,resourceManager)
-                chunksMeshes[chunkPosition] = chunkMesh
-                GlobalScope.launch {
-                    chunkMesh.buildMesh()
-                    chunkMeshesToBeLoaded.add(chunkMesh)
+                if (chunksMeshes.contains(chunkPosition)) {
+                    val chunkMesh = chunksMeshes.remove(chunkPosition)
+                    chunkMeshesToBeUnloaded.add(chunkMesh)
+                    scene.entities.remove(chunkMesh?.chunkMesh)
+                    scene.waterEntities.remove(chunkMesh?.chunkMesh)
                 }
+                val chunkMesh = ChunkMesh(it, material, resourceManager)
+                chunksMeshes[chunkPosition] = chunkMesh
+                chunkMeshesToBeLoaded.add(chunkMesh)
             }
         }
-        if(chunkMeshesToBeLoaded.isNotEmpty()){
-            val chunkMesh = chunkMeshesToBeLoaded.poll()
+        if (chunkMeshesToBeRendered.isNotEmpty()) {
+            val chunkMesh = chunkMeshesToBeRendered.poll()
             val chunkPosition = chunkMesh.chunk.position
-            Loader.loadMesh(chunkMesh.chunkMesh)
+            var mesh = chunkMesh.chunkMesh!!
+            mesh.vao = Loader.getVAO()
+            Loader.bindVAO(mesh.vao)
+            mesh.indicesVbo = Loader.getVBO()
+            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
+            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
+            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
+            mesh.uvsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
+            }
+            mesh.tangentsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
+            }
             val anchors = LinkedList<Vector3f>()
             for (i in 0..30) {
                 anchors.add(Vector3f(chunkPosition.x * 16f + 8f, 8f * i + 8f, chunkPosition.y * 16 + 8f))
             }
             val frustumFilter = FrustumFilter(anchors, 10f)
-            val entity = Entity(chunkMesh.chunkMesh, frustumFilter)
-            entity.transformation.setPosition(chunkPosition.x*16f,0f,chunkPosition.y*16f)
-            scene.entities[chunkMesh.chunkMesh] = listOf(entity)
-            val waterMesh = chunkMesh.waterMesh
-            Loader.loadMesh(waterMesh)
-            val waterEntity = Entity(waterMesh, frustumFilter)
-            waterEntity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
-            scene.waterEntities[waterMesh] = listOf(waterEntity)
-        }
-        val blockBelowPosition = Vector3f(camera.position).add(0f,-2f,0f)
-        val blockBelow = worldManager.getBlock(blockBelowPosition)
-        if(blockBelow == BlockMaterial.AIR.id){
-            val movement = Vector3f(0f,-2.5f,0f)
-            val predictedY = camera.position.y-movement.y
-            if(predictedY < blockBelowPosition.y+2){
-                movement.y = -(camera.position.y-blockBelowPosition.y+2)
+            val entity = Entity(chunkMesh.chunkMesh!!, frustumFilter)
+            entity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+            scene.entities[chunkMesh.chunkMesh!!] = listOf(entity)
+            mesh = chunkMesh.waterMesh!!
+            mesh.vao = Loader.getVAO()
+            Loader.bindVAO(mesh.vao)
+            mesh.indicesVbo = Loader.getVBO()
+            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
+            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
+            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
+            mesh.uvsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
             }
-            camera.prepareMovement(movement.x,movement.y,movement.z)
+            mesh.tangentsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
+            }
+            val waterEntity = Entity(mesh, frustumFilter)
+            waterEntity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+            scene.waterEntities[mesh] = listOf(waterEntity)
+        }
+        val blockBelowPosition = Vector3f(camera.position).add(0f, -2f, 0f)
+        val blockBelow = worldManager.getBlock(blockBelowPosition)
+        if (blockBelow == BlockMaterial.AIR.id) {
+            val movement = Vector3f(0f, -2.5f, 0f)
+            val predictedY = camera.position.y - movement.y
+            if (predictedY < blockBelowPosition.y + 2) {
+                movement.y = -(camera.position.y - blockBelowPosition.y + 2)
+            }
+            camera.prepareMovement(movement.x, movement.y, movement.z)
         }
     }
 
@@ -238,103 +256,32 @@ class CubicWorld : GameLogic {
     private fun createSkyBox(): SkyBox {
         val texture = TextureLoader.createTexture("src/main/resources/textures/skybox/skybox.png")
         val material = Material(texture, null, null, reflectance = 0f)
-        val vertices = floatArrayOf(
-            //FRONT FACE
-            -1f, 1f, -1f, //0
-            -1f, -1f, -1f, //1
-            1f, -1f, -1f, //2
-            1f, 1f, -1f, //3
-            //RIGHT FACE
-            1f, 1f, -1f, //4
-            1f, -1f, -1f, //5
-            1f, -1f, 1f, //6
-            1f, 1f, 1f, //7
-            //LEFT FACE
-            -1f, 1f, 1f, //8
-            -1f, -1f, 1f, //9
-            -1f, -1f, -1f, //10
-            -1f, 1f, -1f, //11
-            //TOP FACE
-            -1f, 1f, 1f, //12
-            -1f, 1f, -1f, //13
-            1f, 1f, -1f, //14
-            1f, 1f, 1f, //15
-            //BOTTOM FACE
-            -1f, -1f, -1f, //16
-            -1f, -1f, 1f, //17
-            1f, -1f, 1f, //18
-            1f, -1f, -1f, //19
-            //BACK FACE
-            1f, 1f, 1f, //20
-            1f, -1f, 1f, //21
-            -1f, -1f, 1f, //22
-            -1f, 1f, 1f //23
-        )
-        val indices = intArrayOf(
-            //front
-            0, 1, 3, 3, 1, 2,
-            //right
-            4, 5, 7, 7, 5, 6,
-            //left
-            8, 9, 11, 11, 9, 10,
-            //top
-            12, 13, 15, 15, 13, 14,
-            //bottom
-            16, 17, 19, 19, 17, 18,
-            //back
-            20, 21, 23, 23, 21, 22
-        )
-        val normals = floatArrayOf(
-            //FRONT
-            0f, 0f, -1f,
-            0f, 0f, -1f,
-            0f, 0f, -1f,
-            0f, 0f, -1f,
-            //RIGHT
-            1f, 0f, 0f,
-            1f, 0f, 0f,
-            1f, 0f, 0f,
-            1f, 0f, 0f,
-            //LEFT
-            -1f, 0f, 0f,
-            -1f, 0f, 0f,
-            -1f, 0f, 0f,
-            -1f, 0f, 0f,
-            //TOP
-            0f, 1f, 0f,
-            0f, 1f, 0f,
-            0f, 1f, 0f,
-            0f, 1f, 0f,
-            //BOTTOM
-            0f, -1f, 0f,
-            0f, -1f, 0f,
-            0f, -1f, 0f,
-            0f, -1f, 0f,
-            //BACK
-            0f, 0f, 1f,
-            0f, 0f, 1f,
-            0f, 0f, 1f,
-            0f, 0f, 1f,
-        )
-        val uvs = floatArrayOf(
-            //FRONT
-            0f, 0f, 0f, 0.33f, 0.33f, 0.33f, 0.33f, 0f,
-            //RIGHT
-            0f, 0.33f, 0f, 0.66f, 0.33f, 0.66f, 0.33f, 0.33f,
-            //LEFT
-            0.66f, 0f, 0.66f, 0.33f, 1f, 0.33f, 1f, 0f,
-            //TOP
-            0.33f, 0.33f, 0.33f, 0.66f, 0.66f, 0.66f, 0.66f, 0.33f,
-            //BOTTOM
-            0.66f, 0.33f, 0.66f, 0.66f, 1f, 0.66f, 1f, 0.33f,
-            //BACK
-            0.33f, 0f, 0.33f, 0.33f, 0.66f, 0.33f, 0.66f, 0f,
-        )
-        val mesh = Mesh(vertices, indices, normals, uvs, null, material)
+        val mesh = OBJLoader.loadMesh("src/main/resources/models/skybox/skybox.obj",material)
         Loader.loadMesh(mesh)
         val skyBox = SkyBox(mesh, SkyBoxShader())
         skyBox.transformation.scale = 100f
         return skyBox
+    }
+
+    private fun runThread() {
+        Thread() {
+            val window = Window("loading context", 100, 100, GameEngine.getMainWindowId())
+            window.showWindow(false)
+            while (true) {
+                if (chunkMeshesToBeLoaded.isNotEmpty()) {
+                    val chunkMesh = chunkMeshesToBeLoaded.poll()
+                    chunkMesh.buildMesh()
+                    chunkMesh.chunkMesh?.let { Loader.loadMeshInVBOs(it) }
+                    chunkMesh.waterMesh?.let { Loader.loadMeshInVBOs(it) }
+                    chunkMeshesToBeRendered.add(chunkMesh)
+                }
+                if (chunkMeshesToBeUnloaded.isNotEmpty()) {
+                    val chunkMesh = chunkMeshesToBeUnloaded.poll()
+                    chunkMesh.chunkMesh?.clear()
+                    chunkMesh.waterMesh?.clear()
+                }
+            }
+        }.start()
     }
 
 }
