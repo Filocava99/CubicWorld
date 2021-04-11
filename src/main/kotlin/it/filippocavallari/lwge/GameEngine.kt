@@ -28,6 +28,9 @@ class GameEngine(val gameLogic: GameLogic) {
             enableDepthTest(true)
             showWindow(true)
         }
+        secondContext = Window("Second context",100,100, window.windowId)
+        secondContext.showWindow(false)
+        window.makeContextCurrent()
         mouseManager = MouseManager(window.windowId)
         keyboardManager = KeyboardManager(window.windowId)
         projectionMatrix = window.projectionMatrix
@@ -112,6 +115,7 @@ class GameEngine(val gameLogic: GameLogic) {
 
     companion object{
         private lateinit var window: Window
+        private lateinit var secondContext: Window
         lateinit var projectionMatrix: Matrix4f
         val eventBus = EventBus()
         lateinit var mouseManager: MouseManager
@@ -125,8 +129,8 @@ class GameEngine(val gameLogic: GameLogic) {
             window.enableDebugMode(!window.debug)
         }
 
-        fun getMainWindowId(): Long{
-            return window.windowId
+        fun getSecondContext(): Window{
+            return secondContext
         }
     }
 }

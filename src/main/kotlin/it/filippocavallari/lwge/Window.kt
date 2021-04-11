@@ -72,9 +72,13 @@ class Window(
                 }
             }
         })
+        makeContextCurrent()
+        updateClearColor()
+    }
+
+    fun makeContextCurrent(){
         glfwMakeContextCurrent(windowId)
         GL.createCapabilities()
-        updateClearColor()
     }
 
     fun enableFullScreen(flag: Boolean) {

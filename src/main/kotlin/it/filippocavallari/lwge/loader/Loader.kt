@@ -96,7 +96,6 @@ object Loader {
     fun loadMeshInVBOs(mesh: Mesh){
         //Vertices
         val verticesVbo = getVBO()
-        println(verticesVbo)
         mesh.verticesVbo = verticesVbo
         loadVerticesInVbo(verticesVbo,mesh.vertices)
         //Normals
@@ -200,11 +199,8 @@ object Loader {
     }
 
     private fun loadFloatBufferInVbo(buffer: Buffer, vbo: Vbo){
-        println("aaa")
         glBindBuffer(GL_ARRAY_BUFFER, vbo.id)
-        println("bbb")
         glBufferData(GL_ARRAY_BUFFER, buffer as FloatBuffer, GL_STATIC_DRAW)
-        println("ccc")
     }
 
 }

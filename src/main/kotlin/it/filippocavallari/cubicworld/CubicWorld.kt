@@ -16,7 +16,6 @@ import it.filippocavallari.cubicworld.world.chunk.WorldManager
 import it.filippocavallari.lwge.GameEngine
 import it.filippocavallari.lwge.GameLogic
 import it.filippocavallari.lwge.Scene
-import it.filippocavallari.lwge.Window
 import it.filippocavallari.lwge.graphic.Fog
 import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.SkyBox
@@ -35,9 +34,11 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL11C
+import org.lwjgl.opengl.GL11C.*
 import org.lwjgl.opengl.GL30C
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.math.floor
 
 class CubicWorld : GameLogic {
 
@@ -60,9 +61,11 @@ class CubicWorld : GameLogic {
     private val worldManager = WorldManager()
 
     override fun init() {
+        println(glGetString(GL_VENDOR))
+        println(glGetString(GL_RENDERER))
         runThread()
-//        Loader.createVAOs(300)
-//        Loader.createVBOs(1000)
+        Loader.createVAOs(300)
+        Loader.createVBOs(1000)
         shaderProgram = BasicShader()
         resourceManager = ResourceManager()
         val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas.png")
@@ -92,7 +95,7 @@ class CubicWorld : GameLogic {
 
     override fun input() {
         val camera = scene.camera
-        val walkSpeed = 1f
+        val walkSpeed = 5
         val flySpeed = 5f
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_W)) {
             camera.prepareMovement(0f, 0f, -1f * walkSpeed)
@@ -112,10 +115,10 @@ class CubicWorld : GameLogic {
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             camera.prepareMovement(0f, -1f * flySpeed, 0f)
         }
-        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f, -2f, 0f)
-        if (worldManager.getBlock(newDestination) != BlockMaterial.AIR.id) {
-            scene.camera.preparedMovement.zero()
-        }
+//        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f, -2f, 0f)
+//        if (worldManager.getBlock(newDestination) != BlockMaterial.AIR.id) {
+//            scene.camera.preparedMovement.zero()
+//        }
     }
 
     override fun update(interval: Float) {
@@ -186,7 +189,7 @@ class CubicWorld : GameLogic {
             waterEntity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
             scene.waterEntities[mesh] = listOf(waterEntity)
         }
-        val blockBelowPosition = Vector3f(camera.position).add(0f, -2f, 0f)
+        val blockBelowPosition = Vector3f(floor(camera.position.x), floor(camera.position.y), floor(camera.position.z)).add(0f, -2f, 0f)
         val blockBelow = worldManager.getBlock(blockBelowPosition)
         if (blockBelow == BlockMaterial.AIR.id) {
             val movement = Vector3f(0f, -2.5f, 0f)
@@ -194,7 +197,7 @@ class CubicWorld : GameLogic {
             if (predictedY < blockBelowPosition.y + 2) {
                 movement.y = -(camera.position.y - blockBelowPosition.y + 2)
             }
-            camera.prepareMovement(movement.x, movement.y, movement.z)
+            //camera.prepareMovement(movement.x, movement.y, movement.z)
         }
     }
 
@@ -265,8 +268,8 @@ class CubicWorld : GameLogic {
 
     private fun runThread() {
         Thread() {
-            val window = Window("loading context", 100, 100, GameEngine.getMainWindowId())
-            window.showWindow(false)
+            val window = GameEngine.getSecondContext()
+            window.makeContextCurrent()
             while (true) {
                 if (chunkMeshesToBeLoaded.isNotEmpty()) {
                     val chunkMesh = chunkMeshesToBeLoaded.poll()
