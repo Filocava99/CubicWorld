@@ -12,7 +12,7 @@ import kotlin.system.exitProcess
 
 
 class GameEngine(val gameLogic: GameLogic) {
-    private val TARGET_FPS = 75 //frames per second
+    private val TARGET_FPS = 144 //frames per second
     private val TARGET_UPS = 30 //updates per second
 
 
@@ -58,12 +58,12 @@ class GameEngine(val gameLogic: GameLogic) {
         var accumulator = 0f
         val interval = 1f / TARGET_UPS
         val running = true
-        var fpsTime = 0f
+        var fpsTime = (System.currentTimeMillis()/1000).toFloat()
         while (running && !glfwWindowShouldClose(window.windowId)) {//&& !window.windowShouldClose()) {
             if((System.currentTimeMillis()/1000-fpsTime)>=1){
-                fpsTime = (System.currentTimeMillis()/1000).toFloat()
-                //println(rendering)
+                println(rendering)
                 rendering = 0
+                fpsTime = (System.currentTimeMillis()/1000).toFloat()
             }
             elapsedTime = timer.elapsedTime
             accumulator += elapsedTime
