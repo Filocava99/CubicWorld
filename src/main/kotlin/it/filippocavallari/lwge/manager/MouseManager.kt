@@ -39,9 +39,13 @@ class MouseManager(val windowId: Long) {
     }
 
     fun input() {
+        if(!cursorInsideWindows){
+            glfwSetCursorPos(glfwGetPrimaryMonitor(),1920.0,1080.0)
+            resetDisplacementVector()
+        }
         displacementVector.x = 0.0
         displacementVector.y = 0.0
-        if (previousPosition.x > 0 && previousPosition.y > 0 && cursorInsideWindows) {
+
             val deltaX: Double = currentPos.x - previousPosition.x
             val deltaY: Double = currentPos.y - previousPosition.y
             val rotateX = deltaX != 0.0
@@ -52,7 +56,7 @@ class MouseManager(val windowId: Long) {
             if (rotateY) {
                 displacementVector.x = deltaY
             }
-        }
+
         previousPosition.x = currentPos.x
         previousPosition.y = currentPos.y
     }
@@ -63,7 +67,7 @@ class MouseManager(val windowId: Long) {
     }
 
     fun lockAndHideCursor(){
-        glfwSetCursorPos(windowId, 1920.0, 1080.0)
+        //glfwSetCursorPos(windowId, 1920.0, 1080.0)
         glfwSetInputMode(windowId, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 

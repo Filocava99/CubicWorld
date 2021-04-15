@@ -13,7 +13,7 @@ class MouseClickListener(val worldManager: WorldManager) : Listener<MouseButtonC
             blockPosition?.let { position ->
                 worldManager.selectedChunk?.let { chunk ->
                     chunk.setBlock(position.x,position.y,position.z, Material.AIR.id)
-                    worldManager.recentModifiedChunks.add(chunk)
+                    worldManager.recentlyModifiedChunks.add(chunk)
                 }
             }
         }

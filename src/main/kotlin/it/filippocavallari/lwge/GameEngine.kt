@@ -5,6 +5,7 @@ import it.filippocavallari.lwge.manager.KeyboardManager
 import it.filippocavallari.lwge.manager.MouseManager
 import org.joml.Matrix4f
 import org.joml.Vector4f
+import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.glfwHideWindow
 import org.lwjgl.glfw.GLFW.glfwWindowShouldClose
 import org.lwjgl.opengl.GL11C.GL_BACK
@@ -12,7 +13,7 @@ import kotlin.system.exitProcess
 
 
 class GameEngine(val gameLogic: GameLogic) {
-    private val TARGET_FPS = 144 //frames per second
+    private val TARGET_FPS = 1000 //frames per second
     private val TARGET_UPS = 30 //updates per second
 
 
@@ -20,15 +21,16 @@ class GameEngine(val gameLogic: GameLogic) {
     private var shouldClose = false
 
     init{
-        window = Window("CubicWorld",3840,2160)
+        window = Window("CubicWorld",3840,2160, GLFW.glfwGetPrimaryMonitor())
         window.setCullFace(GL_BACK)
         window.enableCullFace(true)
         window.run {
             clearColor = Vector4f(255f,255f,255f,0f)
             enableDepthTest(true)
             showWindow(true)
+            enableFullScreen(false)
         }
-        secondContext = Window("Second context",100,100, window.windowId)
+        secondContext = Window("Second context",100,100, 0,window.windowId)
         secondContext.showWindow(false)
         window.makeContextCurrent()
         mouseManager = MouseManager(window.windowId)
@@ -48,22 +50,17 @@ class GameEngine(val gameLogic: GameLogic) {
         }
     }
 
-    fun stop(){
-        shouldClose = true
-    }
-
     private fun gameLoop() {
         var rendering = 0
         var elapsedTime: Float
         var accumulator = 0f
         val interval = 1f / TARGET_UPS
         val running = true
-        var fpsTime = (System.currentTimeMillis()/1000).toFloat()
+        var fpsTime = System.currentTimeMillis()
         while (running && !glfwWindowShouldClose(window.windowId)) {//&& !window.windowShouldClose()) {
-            if((System.currentTimeMillis()/1000-fpsTime)>=1){
-                println(rendering)
+            if((System.currentTimeMillis()-fpsTime)>=1000){
                 rendering = 0
-                fpsTime = (System.currentTimeMillis()/1000).toFloat()
+                fpsTime = System.currentTimeMillis()
             }
             elapsedTime = timer.elapsedTime
             accumulator += elapsedTime

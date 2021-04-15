@@ -8,7 +8,9 @@ import it.filippocavallari.lwge.graphic.shader.ShaderProgram
 import it.filippocavallari.lwge.graphic.water.WaterFrameBuffers
 import it.filippocavallari.lwge.loader.TextureLoader
 import it.filippocavallari.lwge.renderer.Renderer
+import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL11C
+import org.lwjgl.opengl.GL11C.GL_VERTEX_ARRAY
 import org.lwjgl.opengl.GL13C
 import org.lwjgl.opengl.GL30C
 
@@ -33,7 +35,6 @@ class WaterRenderer(val shaderProgram: ShaderProgram, val scene: Scene, val wate
         shaderProgram.setUniform("moveFactor",moveFactor)
         shaderProgram.setUniform("projectionMatrix", GameEngine.projectionMatrix)
         shaderProgram.setUniform("cameraPosition", camera.position)
-        GL11C.glEnable(GL30C.GL_CLIP_DISTANCE0)
         entities.forEach { entry ->
             val mesh = entry.key
             initRender(mesh)
@@ -49,6 +50,9 @@ class WaterRenderer(val shaderProgram: ShaderProgram, val scene: Scene, val wate
     }
 
     private fun initRender(mesh: Mesh) {
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
         GL30C.glBindVertexArray(mesh.vao.id)
         GL13C.glActiveTexture(GL13C.GL_TEXTURE0)
         GL13C.glBindTexture(GL13C.GL_TEXTURE_2D, waterFrameBuffers.reflectionTexture)
@@ -58,10 +62,14 @@ class WaterRenderer(val shaderProgram: ShaderProgram, val scene: Scene, val wate
         GL13C.glBindTexture(GL13C.GL_TEXTURE_2D, dudvTexture.id)
         GL13C.glActiveTexture(GL13C.GL_TEXTURE3)
         GL13C.glBindTexture(GL13C.GL_TEXTURE_2D, normalMap.id)
+        GL11C.glEnable(GL30C.GL_CLIP_DISTANCE0)
     }
 
     private fun endRender() {
-        GL30C.glBindVertexArray(0)
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+        GL11C.glDisable(GL30C.GL_CLIP_DISTANCE0)
     }
 
     override fun clear() {

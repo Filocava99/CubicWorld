@@ -19,10 +19,8 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
     fun update() {
         val mouseSensitivity = 0.1f
         movePosition()
-        //if (GameEngine.mouseManager.rightMouseButton) {
-            val rotVec = GameEngine.mouseManager.displacementVector
-            rotate(rotVec.x.toFloat() * mouseSensitivity, rotVec.y.toFloat() * mouseSensitivity, 0f)
-        //}
+        val rotVec = GameEngine.mouseManager.displacementVector
+        rotate(rotVec.x.toFloat() * mouseSensitivity, rotVec.y.toFloat() * mouseSensitivity, 0f)
     }
 
     fun setPosition(x: Float, y: Float, z: Float) {
@@ -52,7 +50,7 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         preparedMovement.z += offsetZ
     }
 
-    fun invertPitch(){
+    fun invertPitch() {
         rotation.x = -rotation.x
     }
 
@@ -71,16 +69,19 @@ class Camera(val position: Vector3f = Vector3f(0f, 0f, 0f), val rotation: Vector
         preparedMovement.y = 0f
         preparedMovement.z = 0f
         updateViewMatrix()
-        val oldChunkX = floor(oldPosition.x/16).toInt()
-        val newChunkX = floor(position.x/16).toInt()
-        val oldChunkZ = floor(oldPosition.z/16).toInt()
-        val newChunkZ =  floor(position.z/16).toInt()
-        if(oldChunkX!= newChunkX || oldChunkZ != newChunkZ){
-            GameEngine.eventBus.dispatchEvent(PlayerChangedChunkEvent(Vector2i(oldChunkX,oldChunkZ),
-                Vector2i(newChunkX,newChunkZ)
-            ))
+        val oldChunkX = floor(oldPosition.x / 16).toInt()
+        val newChunkX = floor(position.x / 16).toInt()
+        val oldChunkZ = floor(oldPosition.z / 16).toInt()
+        val newChunkZ = floor(position.z / 16).toInt()
+        if (oldChunkX != newChunkX || oldChunkZ != newChunkZ) {
+            GameEngine.eventBus.dispatchEvent(
+                PlayerChangedChunkEvent(
+                    Vector2i(oldChunkX, oldChunkZ),
+                    Vector2i(newChunkX, newChunkZ)
+                )
+            )
         }
-        GameEngine.eventBus.dispatchEvent(PlayerMoveEvent(oldPosition,Vector3f(position)))
+        GameEngine.eventBus.dispatchEvent(PlayerMoveEvent(oldPosition, Vector3f(position)))
     }
 
     private fun updateViewMatrix() {

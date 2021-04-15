@@ -19,7 +19,7 @@ class ChunkGenerator(val seed: Int) {
         val chunk = Chunk(Vector2i(chunkX,chunkZ))
         fun inFun(x: Int){
             for(z in 0..15){
-                val height = sumOctave(16, chunkX*16+x, chunkZ*16+z, 0.01f,0.8f,0,100).toInt()
+                val height = sumOctave(16, chunkX*16+x, chunkZ*16+z, 0.01f,0.008f,0,100).toInt()
                 for(y in 0..height){
                     val blockId = if(y == height) Material.GRASS.id else if(y >= height-5) Material.DIRT.id else Material.STONE.id
                     chunk.setBlock(x,y,z,blockId)

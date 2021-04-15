@@ -36,7 +36,8 @@ void main() {
     vec4 normalmapColor = texture(normalMap, distortedTexCoords);
     vec3 normal = vec3(normalmapColor.r * 2 -1, normalmapColor.b, normalmapColor.g*2-1);
     normal = normalize(normal);
-    outColor = mix(reflectColor,refractColor, refractiveFactor);
+    //outColor = mix(reflectColor,refractColor, refractiveFactor);
+    outColor = mix(refractColor,reflectColor, refractiveFactor*0.000000001);
     outColor = mix(outColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2);
     outColor = mix(outColor, vec4(normal,1), 0.00001);
 }

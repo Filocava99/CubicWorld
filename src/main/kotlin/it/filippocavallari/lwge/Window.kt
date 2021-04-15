@@ -20,6 +20,7 @@ class Window(
     val title: String,
     var width: Int,
     var height: Int,
+    val monitor: Long = 0,
     val sharingWindowId: Long = 0
 ) {
 
@@ -53,7 +54,7 @@ class Window(
             throw IllegalStateException("Unable to initialize GLFW")
         }
         setupWindowHint()
-        windowId = glfwCreateWindow(width, height, title, 0, sharingWindowId)
+        windowId = glfwCreateWindow(width, height, title, monitor, sharingWindowId)
 
         glfwSetFramebufferSizeCallback(windowId, object : GLFWFramebufferSizeCallback() {
             override fun invoke(window: Long, width: Int, height: Int) {

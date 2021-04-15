@@ -38,7 +38,6 @@ import org.lwjgl.opengl.GL11C.*
 import org.lwjgl.opengl.GL30C
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.math.floor
 
 class CubicWorld : GameLogic {
 
@@ -64,8 +63,8 @@ class CubicWorld : GameLogic {
         println(glGetString(GL_VENDOR))
         println(glGetString(GL_RENDERER))
         runThread()
-        Loader.createVAOs(300)
-        Loader.createVBOs(1000)
+        Loader.createVAOs(2000)
+        Loader.createVBOs(2000)
         shaderProgram = BasicShader()
         resourceManager = ResourceManager()
         val texture = TextureLoader.createTexture("src/main/resources/textures/blocks/atlas.png")
@@ -95,7 +94,7 @@ class CubicWorld : GameLogic {
 
     override fun input() {
         val camera = scene.camera
-        val walkSpeed = 5
+        val walkSpeed = 0.5f
         val flySpeed = 5f
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_W)) {
             camera.prepareMovement(0f, 0f, -1f * walkSpeed)
@@ -115,7 +114,7 @@ class CubicWorld : GameLogic {
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             camera.prepareMovement(0f, -1f * flySpeed, 0f)
         }
-//        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f, -2f, 0f)
+//        val newDestination = Vector3f(scene.camera.position).add(scene.camera.preparedMovement).add(0f, -2f, 0f).floor()
 //        if (worldManager.getBlock(newDestination) != BlockMaterial.AIR.id) {
 //            scene.camera.preparedMovement.zero()
 //        }
@@ -126,70 +125,8 @@ class CubicWorld : GameLogic {
         this.interval = interval
         camera.update()
         worldManager.updateSelectedBlock(camera)
-        while (worldManager.recentlyRemovedChunks.isNotEmpty()) {
-            val chunk = worldManager.recentlyRemovedChunks.poll()
-            val chunkMesh = chunksMeshes.remove(chunk.position)
-            scene.entities.remove(chunkMesh?.chunkMesh)
-            scene.waterEntities.remove(chunkMesh?.waterMesh)
-            chunkMeshesToBeUnloaded.add(chunkMesh)
-        }
-        while (worldManager.recentModifiedChunks.isNotEmpty()) {
-            val chunk = worldManager.recentModifiedChunks.poll()
-            chunk?.let {
-                val chunkPosition = it.position
-                if (chunksMeshes.contains(chunkPosition)) {
-                    val chunkMesh = chunksMeshes.remove(chunkPosition)
-                    chunkMeshesToBeUnloaded.add(chunkMesh)
-                    scene.entities.remove(chunkMesh?.chunkMesh)
-                    scene.waterEntities.remove(chunkMesh?.chunkMesh)
-                }
-                val chunkMesh = ChunkMesh(it, material, resourceManager)
-                chunksMeshes[chunkPosition] = chunkMesh
-                chunkMeshesToBeLoaded.add(chunkMesh)
-            }
-        }
-        if (chunkMeshesToBeRendered.isNotEmpty()) {
-            val chunkMesh = chunkMeshesToBeRendered.poll()
-            val chunkPosition = chunkMesh.chunk.position
-            var mesh = chunkMesh.chunkMesh!!
-            mesh.vao = Loader.getVAO()
-            Loader.bindVAO(mesh.vao)
-            mesh.indicesVbo = Loader.getVBO()
-            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
-            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
-            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
-            mesh.uvsVbo?.let {
-                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
-            }
-            mesh.tangentsVbo?.let {
-                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
-            }
-            val anchors = LinkedList<Vector3f>()
-            for (i in 0..30) {
-                anchors.add(Vector3f(chunkPosition.x * 16f + 8f, 8f * i + 8f, chunkPosition.y * 16 + 8f))
-            }
-            val frustumFilter = FrustumFilter(anchors, 10f)
-            val entity = Entity(chunkMesh.chunkMesh!!, frustumFilter)
-            entity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
-            scene.entities[chunkMesh.chunkMesh!!] = listOf(entity)
-            mesh = chunkMesh.waterMesh!!
-            mesh.vao = Loader.getVAO()
-            Loader.bindVAO(mesh.vao)
-            mesh.indicesVbo = Loader.getVBO()
-            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
-            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
-            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
-            mesh.uvsVbo?.let {
-                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
-            }
-            mesh.tangentsVbo?.let {
-                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
-            }
-            val waterEntity = Entity(mesh, frustumFilter)
-            waterEntity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
-            scene.waterEntities[mesh] = listOf(waterEntity)
-        }
-        val blockBelowPosition = Vector3f(floor(camera.position.x), floor(camera.position.y), floor(camera.position.z)).add(0f, -2f, 0f)
+        updateChunkMeshes()
+        val blockBelowPosition = Vector3f(camera.position).floor().add(0f, -2f, 0f)
         val blockBelow = worldManager.getBlock(blockBelowPosition)
         if (blockBelow == BlockMaterial.AIR.id) {
             val movement = Vector3f(0f, -2.5f, 0f)
@@ -197,7 +134,7 @@ class CubicWorld : GameLogic {
             if (predictedY < blockBelowPosition.y + 2) {
                 movement.y = -(camera.position.y - blockBelowPosition.y + 2)
             }
-            //camera.prepareMovement(movement.x, movement.y, movement.z)
+            camera.prepareMovement(movement.x, movement.y, movement.z)
         }
     }
 
@@ -213,6 +150,7 @@ class CubicWorld : GameLogic {
         scene.camera.invertPitch()
         worldRenderer.render()
         skyBoxRenderer.render()
+
         //worldRenderer.clippingPlane = Vector4f(0f,-1f,0f,waterHeight)
         worldRenderer.clippingPlane = Vector4f(0f, 0f, 0f, 1500000f)
         scene.camera.position.y += distance
@@ -220,6 +158,7 @@ class CubicWorld : GameLogic {
         waterFrameBuffers.bindRefractionFrameBuffer()
         worldRenderer.render()
         skyBoxRenderer.render()
+
         waterFrameBuffers.unbindCurrentFrameBuffer()
         GL11C.glDisable(GL30C.GL_CLIP_DISTANCE0)
         worldRenderer.clippingPlane = Vector4f(0f, 0f, 0f, 0f)
@@ -266,6 +205,102 @@ class CubicWorld : GameLogic {
         return skyBox
     }
 
+    private fun updateChunkMeshes(){
+        while (worldManager.recentlyRemovedChunks.isNotEmpty()) {
+            val chunk = worldManager.recentlyRemovedChunks.poll()
+            val chunkMesh = chunksMeshes.remove(chunk.position)
+            chunkMesh?.chunkMesh?.vao?.let {
+                scene.entities.remove(chunkMesh.chunkMesh)
+                scene.waterEntities.remove(chunkMesh.waterMesh)
+                chunkMeshesToBeUnloaded.add(chunkMesh)
+            }
+        }
+        while (worldManager.recentlyModifiedChunks.isNotEmpty()) {
+            val chunk = worldManager.recentlyModifiedChunks.poll()
+            chunk?.let {
+                val chunkPosition = it.position
+                if (chunksMeshes.contains(chunkPosition)) {
+                    val chunkMesh = chunksMeshes.remove(chunkPosition)
+                    chunkMeshesToBeUnloaded.add(chunkMesh)
+                    scene.entities.remove(chunkMesh?.chunkMesh)
+                    scene.waterEntities.remove(chunkMesh?.chunkMesh)
+                }
+                val chunkMesh = ChunkMesh(it, material, resourceManager)
+                chunkMesh.buildMesh()
+                Loader.loadMesh(chunkMesh.chunkMesh!!)
+                Loader.loadMesh(chunkMesh.waterMesh!!)
+                val anchors = LinkedList<Vector3f>()
+                for (i in 0..30) {
+                    anchors.add(Vector3f(chunkPosition.x * 16f + 8f, 8f * i + 8f, chunkPosition.y * 16 + 8f))
+                }
+                val frustumFilter = FrustumFilter(anchors, 10f)
+                var entity = Entity(chunkMesh.chunkMesh!!, frustumFilter)
+                entity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+                scene.entities[chunkMesh.chunkMesh!!] = listOf(entity)
+                entity = Entity(chunkMesh.waterMesh!!, frustumFilter)
+                entity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+                scene.waterEntities[chunkMesh.chunkMesh!!] = listOf(entity)
+                chunksMeshes[chunkPosition] = chunkMesh
+            }
+        }
+        if(worldManager.recentlyLoadedChunks.isNotEmpty()){
+            val chunk = worldManager.recentlyLoadedChunks.poll()
+            chunk?.let {
+                val chunkPosition = it.position
+                if (chunksMeshes.contains(chunkPosition)) {
+                    val chunkMesh = chunksMeshes.remove(chunkPosition)
+                    chunkMeshesToBeUnloaded.add(chunkMesh)
+                    scene.entities.remove(chunkMesh?.chunkMesh)
+                    scene.waterEntities.remove(chunkMesh?.chunkMesh)
+                }
+                val chunkMesh = ChunkMesh(it, material, resourceManager)
+                chunkMeshesToBeLoaded.add(chunkMesh)
+            }
+        }
+        if (chunkMeshesToBeRendered.isNotEmpty()) {
+            val chunkMesh = chunkMeshesToBeRendered.poll()
+            val chunkPosition = chunkMesh.chunk.position
+            var mesh = chunkMesh.chunkMesh!!
+            mesh.vao = Loader.getVAO()
+            Loader.bindVAO(mesh.vao)
+            mesh.indicesVbo = Loader.getVBO()
+            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
+            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
+            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
+            mesh.uvsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
+            }
+            mesh.tangentsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
+            }
+            val anchors = LinkedList<Vector3f>()
+            for (i in 0..30) {
+                anchors.add(Vector3f(chunkPosition.x * 16f + 8f, 8f * i + 8f, chunkPosition.y * 16 + 8f))
+            }
+            val frustumFilter = FrustumFilter(anchors, 10f)
+            val entity = Entity(chunkMesh.chunkMesh!!, frustumFilter)
+            entity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+            scene.entities[chunkMesh.chunkMesh!!] = listOf(entity)
+            mesh = chunkMesh.waterMesh!!
+            mesh.vao = Loader.getVAO()
+            Loader.bindVAO(mesh.vao)
+            mesh.indicesVbo = Loader.getVBO()
+            Loader.loadIndicesInVbo(mesh.indicesVbo, mesh.indices)
+            Loader.loadVBOinVAO(mesh.vao,mesh.verticesVbo,0, 3)
+            Loader.loadVBOinVAO(mesh.vao,mesh.normalsVbo,2, 3)
+            mesh.uvsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao, it,1, 2)
+            }
+            mesh.tangentsVbo?.let {
+                Loader.loadVBOinVAO(mesh.vao,it,3, 3)
+            }
+            val waterEntity = Entity(mesh, frustumFilter)
+            waterEntity.transformation.setPosition(chunkPosition.x * 16f, 0f, chunkPosition.y * 16f)
+            scene.waterEntities[mesh] = listOf(waterEntity)
+            chunksMeshes[chunkPosition] = chunkMesh
+        }
+    }
+
     private fun runThread() {
         Thread() {
             val window = GameEngine.getSecondContext()
@@ -276,6 +311,7 @@ class CubicWorld : GameLogic {
                     chunkMesh.buildMesh()
                     chunkMesh.chunkMesh?.let { Loader.loadMeshInVBOs(it) }
                     chunkMesh.waterMesh?.let { Loader.loadMeshInVBOs(it) }
+                    glFinish()
                     chunkMeshesToBeRendered.add(chunkMesh)
                 }
                 if (chunkMeshesToBeUnloaded.isNotEmpty()) {

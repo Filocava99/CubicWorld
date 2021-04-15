@@ -8,32 +8,32 @@ import org.lwjgl.opengl.GL43C
 import org.lwjgl.system.MemoryUtil
 import java.nio.Buffer
 import java.nio.FloatBuffer
-import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.stream.Collectors
 
 
 object Loader {
 
-    private val VBOsPool = LinkedList<Vbo>()
-    private val VAOsPool = LinkedList<Vao>()
+    private val VBOsPool = ConcurrentLinkedQueue<Vbo>()
+    private val VAOsPool = ConcurrentLinkedQueue<Vao>()
 
-    private val usedVBOs = LinkedList<Vbo>()
-    private val usedVAOs = LinkedList<Vao>()
+    private val usedVBOs = ConcurrentLinkedQueue<Vbo>()
+    private val usedVAOs = ConcurrentLinkedQueue<Vao>()
 
     fun getVBO() : Vbo {
         if(VBOsPool.isEmpty()){
-            createVBO()
+            createVBOs(30)
         }
-        val vbo = VBOsPool.pollFirst()
+        val vbo = VBOsPool.poll()
         usedVBOs.add(vbo)
         return vbo
     }
 
     fun getVAO() : Vao {
         if(VBOsPool.isEmpty()){
-            createVAO()
+            createVAOs(30)
         }
-        val vao = VAOsPool.pollFirst()
+        val vao = VAOsPool.poll()
         usedVAOs.add(vao)
         return vao
     }

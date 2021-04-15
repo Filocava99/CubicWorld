@@ -5,7 +5,6 @@ import it.filippocavallari.lwge.Scene
 import it.filippocavallari.lwge.graphic.Mesh
 import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.light.PointLight
-import it.filippocavallari.lwge.graphic.water.WaterFrameBuffers
 import it.filippocavallari.lwge.renderer.Renderer
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -87,7 +86,6 @@ class WorldRenderer(val scene: Scene) : Renderer{
     }
 
     private fun endRender() {
-        glBindVertexArray(0)
         glBindTexture(GL_TEXTURE_2D, 0)
     }
 
