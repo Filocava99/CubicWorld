@@ -3,6 +3,7 @@ package it.filippocavallari.lwge.loader
 import it.filippocavallari.lwge.data.Vao
 import it.filippocavallari.lwge.data.Vbo
 import it.filippocavallari.lwge.graphic.Mesh
+import it.filippocavallari.lwge.graphic.gui.GuiEntity
 import org.lwjgl.opengl.GL32C.*
 import org.lwjgl.opengl.GL43C
 import org.lwjgl.system.MemoryUtil
@@ -56,6 +57,19 @@ object Loader {
 
     private fun createVBO(){
         VBOsPool.add(Vbo(glGenBuffers()))
+    }
+
+    fun loadGuiEntity(guiEntity: GuiEntity){
+        guiEntity.vao = getVAO()
+        bindVAO(guiEntity.vao!!)
+        val verticesVbo = getVBO()
+        loadVerticesInVbo(verticesVbo,guiEntity.vertices)
+        loadVBOinVAO(guiEntity.vao!!,verticesVbo,0,3)
+        val indicesVbo = getVBO()
+        loadIndicesInVbo(indicesVbo,guiEntity.indices)
+        val uvsVbo = getVBO()
+        loadUVsInVbo(uvsVbo, guiEntity.uvs)
+        loadVBOinVAO(guiEntity.vao!!,uvsVbo,1,2)
     }
 
     fun loadMesh(mesh: Mesh){

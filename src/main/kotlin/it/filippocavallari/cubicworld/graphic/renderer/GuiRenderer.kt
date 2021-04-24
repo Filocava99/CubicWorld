@@ -30,7 +30,7 @@ class GuiRenderer(val scene: GuiScene) : Renderer{
                 glBindTexture(GL_TEXTURE_2D, guiEntity.texture.id)
                 shaderProgram.setUniform("projModelMatrix",Matrix4f(guiEntity.transformation.getModelMatrix()).mul(GameEngine.projectionMatrix))
                 GL30C.glBindVertexArray(vao.id)
-                glDrawElements(GL_TRIANGLES, mesh.vertices.size, GL_UNSIGNED_INT, 0)
+                glDrawElements(GL_TRIANGLES, guiEntity.verticesNumber, GL_UNSIGNED_INT, 0)
             }
         }
         endRender()
@@ -44,6 +44,7 @@ class GuiRenderer(val scene: GuiScene) : Renderer{
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glActiveTexture(GL13C.GL_TEXTURE0)
+        glDisable(GL_CULL_FACE)
     }
 
     private fun endRender(){

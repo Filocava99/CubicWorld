@@ -9,7 +9,7 @@ class GuiShader : ShaderProgram(){
         this.createFragmentShader(Util.loadResource("src/main/resources/shaders/gui.frag"))
         this.link()
         this.validateProgram()
-        this.createUniform("projModelViewMatrix")
+        this.createUniform("projModelMatrix")
         this.createUniform("textureSampler")
         this.createUniform("color")
     }

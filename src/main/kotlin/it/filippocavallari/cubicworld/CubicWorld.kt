@@ -2,6 +2,7 @@ package it.filippocavallari.cubicworld
 
 import it.filippocavallari.cubicworld.graphic.mesh.BlockMaterial
 import it.filippocavallari.cubicworld.graphic.mesh.ChunkMesh
+import it.filippocavallari.cubicworld.graphic.renderer.GuiRenderer
 import it.filippocavallari.cubicworld.graphic.renderer.SkyBoxRenderer
 import it.filippocavallari.cubicworld.graphic.renderer.WaterRenderer
 import it.filippocavallari.cubicworld.graphic.renderer.WorldRenderer
@@ -21,6 +22,8 @@ import it.filippocavallari.lwge.graphic.Material
 import it.filippocavallari.lwge.graphic.SkyBox
 import it.filippocavallari.lwge.graphic.entity.Entity
 import it.filippocavallari.lwge.graphic.entity.component.FrustumFilter
+import it.filippocavallari.lwge.graphic.gui.GuiEntity
+import it.filippocavallari.lwge.graphic.gui.GuiScene
 import it.filippocavallari.lwge.graphic.light.DirectionalLight
 import it.filippocavallari.lwge.graphic.light.PointLight
 import it.filippocavallari.lwge.graphic.shader.ShaderProgram
@@ -44,8 +47,10 @@ class CubicWorld : GameLogic {
     lateinit var waterFrameBuffers: WaterFrameBuffers
     lateinit var shaderProgram: ShaderProgram
     lateinit var scene: Scene
+    lateinit var guiScene: GuiScene
     lateinit var worldRenderer: WorldRenderer
     lateinit var waterRenderer: WaterRenderer
+    lateinit var guiRenderer: GuiRenderer
     lateinit var resourceManager: ResourceManager
     lateinit var skyBoxRenderer: SkyBoxRenderer
     lateinit var material: Material
@@ -83,18 +88,21 @@ class CubicWorld : GameLogic {
             fog = Fog(true, Vector3f(0.5f, 0.5f, 0.5f), 0.0006f),
             shaderProgram = shaderProgram
         )
+
         scene.camera.setPosition(1f, 200f, 1f)
+        guiScene = createGuiScene()
         worldRenderer = WorldRenderer(scene)
         skyBoxRenderer = SkyBoxRenderer(scene)
         waterFrameBuffers = WaterFrameBuffers()
         waterRenderer = WaterRenderer(WaterShader(), scene, waterFrameBuffers)
-        GameEngine.eventBus.register(MouseClickListener(worldManager))
+        guiRenderer = GuiRenderer(guiScene)
+        GameEngine.eventBus.register(MouseClickListener(scene.camera, worldManager))
         GameEngine.eventBus.register(PlayerChangedChunkListener(worldManager))
     }
 
     override fun input() {
         val camera = scene.camera
-        val walkSpeed = 0.5f
+        val walkSpeed = 1f
         val flySpeed = 5f
         if (GameEngine.keyboardManager.isKeyPressed(GLFW.GLFW_KEY_W)) {
             camera.prepareMovement(0f, 0f, -1f * walkSpeed)
@@ -165,6 +173,7 @@ class CubicWorld : GameLogic {
         worldRenderer.render()
         waterRenderer.render()
         skyBoxRenderer.render()
+        guiRenderer.render()
     }
 
     private fun updateFrustum() {
@@ -323,4 +332,32 @@ class CubicWorld : GameLogic {
         }.start()
     }
 
+    private fun createGuiScene(): GuiScene {
+        val crossair = createCrossair()
+        crossair.transformation.scale = 20f
+        return GuiScene(listOf(crossair))
+    }
+
+    private fun createCrossair(): GuiEntity {
+        val verticesArray = floatArrayOf(
+            -0.5f,0.5f,0f,
+            0.5f,0.5f,0f,
+            0.5f,-0.5f,0f
+            -0.5f,-0.5f,0f
+        )
+        val indicesArray = intArrayOf(
+            0,3,1,
+            1,3,2
+        )
+        val uvsArray = floatArrayOf(
+            0f,1f,
+            1f,1f,
+            1f,0f,
+            0f,0f
+        )
+        val texture = TextureLoader.createTexture("src/main/resources/textures/gui/crossair.png")
+        val crossair = GuiEntity(verticesArray, indicesArray, uvsArray, texture!!)
+        Loader.loadGuiEntity(crossair)
+        return crossair
+    }
 }
