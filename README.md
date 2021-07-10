@@ -1,7 +1,7 @@
 # CubicWorld
 
 ## Introduction
-CubicWorld is a prototype of a Minecraft clone built with LWJGL 3 and Kotlin. It aims to improve visual effects and the texture quality without compromising the performances.
+CubicWorld is a prototype of a Minecraft clone built with LWJGL 3 and Kotlin. It aims to improve both visual effects and texture quality without compromising the performances.
 That project was created as a thesis in Computer Graphics for the faculty of Engineering and Computer Science at the Alma Mater Studiorum University of Bologna.
 
 ## Current features
