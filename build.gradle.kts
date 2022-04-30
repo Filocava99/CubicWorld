@@ -60,6 +60,11 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
 
+tasks.withType<Test> {
+    exclude("**/*")
+
+}
+
 val fatJar = task("fatJar", type = Jar::class) {
     baseName = "${project.name}-fat"
     manifest {
@@ -73,6 +78,6 @@ val fatJar = task("fatJar", type = Jar::class) {
 
 tasks {
     "build" {
-        dependsOn(fatJar)
+        //dependsOn(fatJar)
     }
 }
