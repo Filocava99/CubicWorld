@@ -14,7 +14,7 @@ val lwjglNatives = when (org.gradle.nativeplatform.platform.internal.DefaultNati
 
 plugins {
     java
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.6.21"
 }
 
 group = "org.example"
@@ -32,11 +32,11 @@ tasks.named<Test>("test") {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
     implementation("com.google.guava:guava:30.1-jre")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
     implementation("org.lwjgl", "lwjgl")
     implementation("org.lwjgl", "lwjgl-glfw")
     implementation("org.lwjgl", "lwjgl-openal")
@@ -57,7 +57,7 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }
 
 val fatJar = task("fatJar", type = Jar::class) {

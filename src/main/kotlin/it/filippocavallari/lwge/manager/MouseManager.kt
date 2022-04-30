@@ -67,7 +67,7 @@ class MouseManager(val windowId: Long) {
     }
 
     fun lockAndHideCursor(){
-        //glfwSetCursorPos(windowId, 1920.0, 1080.0)
+        glfwSetCursorPos(windowId, 1920.0, 1080.0)
         glfwSetInputMode(windowId, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
