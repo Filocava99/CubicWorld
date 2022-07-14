@@ -1,3 +1,4 @@
+[![Build status badge](https://raw.githubusercontent.com/Filocava99/Buildy/master/builds/CubicWorld/CubicWorld-build.svg)](https://filocava99.github.io/Buildy/builds/CubicWorld/CubicWorld.html)
 # CubicWorld
 
 ## Introduction
